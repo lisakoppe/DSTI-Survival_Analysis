@@ -1,0 +1,19 @@
+---
+title: Integrated evaluation of clinical, pathological and radiological prognostic factors in squamous cell carcinoma of the lung
+author: Lisa KOPPE, Khwansiri NINPAN, Princy PAPPACHAN
+date: 4/23/2020
+---
+
+Import the necessary packages:
+
+```{r}
+library(tidyverse)
+library(survival)
+library(ggplot2)
+```
+
+Load the lung cancer dataset:
+
+```{r}
+raw_data <- read.csv("lungcancer.csv", sep=';')
+```
