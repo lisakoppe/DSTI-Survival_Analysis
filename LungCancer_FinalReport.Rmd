@@ -214,13 +214,12 @@ Odds for death in patient with specific condition
 divided by odds for death in patient without specific condition
 If those 2 sets of patient have equal odds (odds ratio = 1), that specific condition are independent to death status
 
+----
+1. Difference in risk of death in patient with and without obstructive pneumonitis/ atelectais
+2. Difference in risk of death in patient with and without lung effusion
+----
 
-Here we want to define:
-1. Diffence in risk of death in patient with and without obstructive pneumonitis/ atelectais
-2. Diffence in risk of death in patient with and without lung effusion
-
-
-Diffence in risk of death in patient with and without obstructive pneumonitis/ atelectais:
+1. Difference in risk of death in patient with and without obstructive pneumonitis/ atelectais:
 ```{r}
 with(lungSCC, fisher.test(table(death, Obst_pn_or_plugging)))
 ```
@@ -232,7 +231,7 @@ See that 95% confidence interval ranges from 0.55, where patients with pneumonit
 (Correlate with publication, this feature is suprisingly improve the survival time)
 
 
-Diffence in risk of death in patient with and without lung effusion:
+2. Difference in risk of death in patient with and without lung effusion:
 ```{r}
 with(lungSCC, fisher.test(table(death, Effusion)))
 ```
@@ -240,20 +239,22 @@ Interpretation:
 No relationship between death and lung effusion (p-value = 1)
 Patients with lung effusion have 5% higher risk of death than patients without lung effusion
 
+
 ### Logistic regression
 
+Determine the relationship between categorical continuous variables
+
 ----
-1. Diffence in risk of death based on cancer location
-2. Diffence in risk of death based on cell necrosis
-3. Diffence in risk of death based on underlying lung disease
+1. Difference in risk of death based on cancer location
+2. Difference in risk of death based on cell necrosis
+3. Difference in risk of death based on underlying lung disease
 ----
 
-1. Diffence in risk of death based on cancer location
+1. Difference in risk of death based on cancer location:
 ```{r}
 fit <- glm(death~Location, family="binomial", data=lungSCC)
 summary(fit)
 ```
-
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
 2. The negative value of estimate coefficient of LocationInvisible indicates that odds of invisible lung cancer is lower than odds of central lung cancer. 
@@ -268,12 +269,11 @@ Interpretation:
 Risk of death of patients who have invisible lung cancer is around 30% lower than patients with central lung cancer, while risk of death of peripheral lung cancer patients is around 30% higher than that of central lung cancer patients.
 
 
-2. Diffence in risk of death based on cell necrosis
+2. Difference in risk of death based on cell necrosis:
 ```{r}
 fit <- glm(death~Necrosis, family="binomial", data=lungSCC)
 summary(fit)
 ```
-
 Interpretation:
 1. No cell necrosis observation shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0238 (i.e No necrosis reduces risk of death).
 2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
@@ -282,17 +282,15 @@ Interpretation:
 exp(-0.7482)
 exp(-0.9840)
 ```
-
 Interpretation:
 Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  63% lower than patients with cavitization.
 
 
-3. Diffence in risk of death based on underlying lung disease
+3. Difference in risk of death based on underlying lung disease:
 ```{r}
 fit <- glm(death~Underlying_lung, family="binomial", data=lungSCC)
 summary(fit)
 ```
-
 Interpretation:
 1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.006.
 2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema. 
@@ -301,7 +299,6 @@ Interpretation:
 exp(1.81475)
 exp(-0.45911)
 ```
-
 Interpretation:
 Risk of death of lung cancer patients with ILA is 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
 
@@ -321,9 +318,112 @@ Odds for death in patient with specific condition
 divided by odds for death in patient without specific condition
 If those 2 sets of patient have equal odds (odds ratio = 1), that specific condition are independent to death status
 
-Here we want to define:
-1. Diffence in risk of death in patient with and without obstructive pneumonitis/ atelectais
-2. Diffence in risk of death in patient with and without lung effusion
+----
+X. Difference in risk of death in patient with and without observed metastasis after surgery (meta)
+----
+
+X. Difference in risk of death in patient with and without observed metastasis after surgery (meta):
+```{r}
+with(lungSCC, fisher.test(table(death, meta)))
+```
+Interpretation: TODO
+
+
+### Logistic regression
+
+Determine the relationship between categorical continuous variables
+
+----
+X. Difference in risk of death based on lymph node ratio
+X. Difference in risk of death based on pT peripheral tumor size
+X. Difference in risk of death based on pN peripheral tumor size
+X. Difference in risk of death based on pM peripheral tumor size
+X. Difference in risk of death based on FEV1_FVC pulmonary function test
+X. Difference in risk of death based on CEA serum
+----
+
+X. Difference in risk of death based on lymph node ratio:
+```{r}
+fit <- glm(death~LN_ratio, family="binomial", data=lungSCC)
+summary(fit)
+```
+Interpretation: TODO
+
+```{r}
+exp()
+exp()
+```
+Interpretation: TODO
+
+X. Difference in risk of death based on pT peripheral tumor size:
+```{r}
+fit <- glm(death~pT, family="binomial", data=lungSCC)
+summary(fit)
+```
+Interpretation: TODO
+
+```{r}
+exp()
+exp()
+```
+Interpretation: TODO
+
+X. Difference in risk of death based on pN peripheral tumor size:
+```{r}
+fit <- glm(death~pN, family="binomial", data=lungSCC)
+summary(fit)
+```
+Interpretation: TODO
+
+```{r}
+exp()
+exp()
+```
+Interpretation: TODO
+
+X. Difference in risk of death based on pM peripheral tumor size:
+```{r}
+fit <- glm(death~pM, family="binomial", data=lungSCC)
+summary(fit)
+```
+Interpretation: TODO
+
+```{r}
+exp()
+exp()
+```
+Interpretation: TODO
+
+X. Difference in risk of death based on FEV1_FVC pulmonary function test:
+```{r}
+fit <- glm(death~FEV1_FVC, family="binomial", data=lungSCC)
+summary(fit)
+```
+Interpretation: TODO
+
+```{r}
+exp()
+exp()
+```
+Interpretation: TODO
+
+X. Difference in risk of death based on CEA serum:
+```{r}
+fit <- glm(death~CEA, family="binomial", data=lungSCC)
+summary(fit)
+```
+Interpretation: TODO
+
+```{r}
+exp()
+exp()
+```
+Interpretation: TODO
+
+
+
+
+
 
 
 # Part 2:
