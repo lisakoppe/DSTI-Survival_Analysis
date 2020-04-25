@@ -258,9 +258,11 @@ summary(fit)
 ```
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The negative value of estimate coefficient of LocationInvisible indicates that odds of invisible lung cancer is lower than odds of central lung cancer. 
+2. The negative value of estimate coefficient of LocationInvisible indicates that invisible lung cancer has negative correlation with risk of death.
+3. Odds of patient with invisible lung cancer is lower than odds of central lung cancer patients.
 To see the odds ratio between these 2 condition, we have to exponent this coefficients (see belows).
-3. Odds of peripheral lung cancer is higher than that of central lung cancer
+4. The presence of peripheral lung cancer has positive relationship with death.
+5. Odds of peripheral lung cancer is higher than that of central lung cancer
 
 ```{r}
 exp(-0.3203)
