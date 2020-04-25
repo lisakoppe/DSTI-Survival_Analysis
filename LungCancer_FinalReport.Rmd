@@ -122,9 +122,8 @@ Define the meaning of each label to make it easier for interpretation
 # TO BE COMPLETED
 
 lungSCC <- mutate(lungSCC_raw,
-                  Location=ifelse(Location==0, "Invisible",
-                                  ifelse(Location==1, "Central", "Peripheral")),
-
+                  Location=ifelse(Location==0, "Peripheral","Central"),
+                                 
                   Necrosis=ifelse(Necrosis==0, "NoRemark",
                                   ifelse(Necrosis==1, "Necrosis", "Cavitization")),
 
