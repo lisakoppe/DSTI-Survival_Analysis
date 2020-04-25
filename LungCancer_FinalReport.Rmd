@@ -63,13 +63,14 @@ lungSCC_raw <- read_csv("LungCancer.csv",
                                        post_opCTx='l',
                                        post_op_RTx='l',
                                        op_type='c',
-                                       death='c',
+                                       death='d',
                                        recur_or_meta='l',
                                        OP_site_recur='l',
                                        meta='l',
                                        meta_site='c',
                                        OS='d',
-                                       DFS='d'))
+                                       DFS='d',
+                                       .default = 'c'))
 ```
 
 Explore the dataset
@@ -350,8 +351,7 @@ summary(fit)
 Interpretation: TODO
 
 ```{r}
-exp()
-exp()
+exp(1.3897)
 ```
 Interpretation: TODO
 
@@ -363,8 +363,9 @@ summary(fit)
 Interpretation: TODO
 
 ```{r}
-exp()
-exp()
+exp(0.4321)
+exp(0.9573)
+exp(1.2622)
 ```
 Interpretation: TODO
 
@@ -376,8 +377,9 @@ summary(fit)
 Interpretation: TODO
 
 ```{r}
-exp()
-exp()
+exp(0.2270)
+exp(1.1673)
+exp(1.6010)
 ```
 Interpretation: TODO
 
@@ -389,8 +391,7 @@ summary(fit)
 Interpretation: TODO
 
 ```{r}
-exp()
-exp()
+exp(15.8683)
 ```
 Interpretation: TODO
 
@@ -402,8 +403,7 @@ summary(fit)
 Interpretation: TODO
 
 ```{r}
-exp()
-exp()
+exp(0.011102)
 ```
 Interpretation: TODO
 
@@ -415,8 +415,7 @@ summary(fit)
 Interpretation: TODO
 
 ```{r}
-exp()
-exp()
+exp(-0.003048)
 ```
 Interpretation: TODO
 
