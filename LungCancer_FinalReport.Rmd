@@ -2,6 +2,7 @@
 title: "Lung Cancer Prognosis"
 author: "Lisa KOPPE, Khwansiri NINPAN, Princy PAPPACHAN"
 date: "4/23/2020"
+output: pdf_document
 ---
 
 Paper:
@@ -10,6 +11,9 @@ Paper:
 # Import the necessary packages:
 
 ```{r}
+
+# REMOVE UNUSED LIBRARIES AT THE END
+
 library(tidyverse)
 library(survival)
 library(ggplot2)
@@ -20,6 +24,9 @@ library(tidyr)
 # Data preparation: load the lung cancer dataset and check data types
 
 ```{r}
+
+# CAREFUL: NEED TO REVIEW DATA TYPES (ESPECIALLY LOGICAL)
+
 lungSCC_raw <- read_csv("LungCancer.csv", 
                         col_types=cols(Index='c',
                                        Sex='c',
@@ -63,7 +70,6 @@ lungSCC_raw <- read_csv("LungCancer.csv",
                                        meta_site='c',
                                        OS='d',
                                        DFS='d'))
-# CAREFUL: NEED TO REVIEW DATA TYPES (ESPECIALLY LOGICAL)
 ```
 
 Explore the dataset
@@ -76,8 +82,8 @@ head(lungSCC_raw)
 summary(lungSCC_raw)
 ```
 
-Check null value and data classification 
-Use table for classification and Logical column to see how they distribute
+Check null value and data classification for all 20 variables.
+Use table for classification and Logical column to see how they distribute.
 Count null value in decimal column (OS)
 
 ```{r}
@@ -111,16 +117,18 @@ table(lungSCC_raw$meta, useNA="always")
 Define the meaning of each label to make it easier for interpretation
 
 ```{r}
+
 # TO BE COMPLETED
+
 lungSCC <- mutate(lungSCC_raw,
-                  Location = ifelse(Location == 0, "Invisible",
-                                    ifelse(Location == 1, "Central", "Peripheral")),
+                  Location=ifelse(Location==0, "Invisible",
+                                  ifelse(Location==1, "Central", "Peripheral")),
                
-                  Necrosis = ifelse(Necrosis == 0, "NoRemark",
-                                    ifelse(Necrosis == 1, "Necrosis", "Cavitization")),
+                  Necrosis=ifelse(Necrosis==0, "NoRemark",
+                                  ifelse(Necrosis==1, "Necrosis", "Cavitization")),
                
-                  Underlying_lung = ifelse(Underlying_lung == 0, "NoRemark",
-                                           ifelse(Underlying_lung == 1, "Emphysema", "ILA")))
+                  Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
+                                         ifelse(Underlying_lung==1, "Emphysema", "ILA")))
 ```
 
 # Features description
@@ -129,51 +137,63 @@ lungSCC <- mutate(lungSCC_raw,
    = tumor location
    (Class: 0=Invisible, 1=Central SCC, 2=Peripheral SCC)
 2. death
-   (Logical: Not Death = 0, Death = 1)
+   (Logical: 0=Alive, 1=Dead)
 3. OS
-   = overall survival: interval between the date of diagnosis and date of death (by any cause)
+   = Overall Survival in months: interval between the date of diagnosis and date of death (by any cause)
     
 ## Radiologic features:
 
 4. Obst_pn_or_plugging
-   = Present of obstructive pneumonitis/atelectais
-   (Logical: 0 = Absent, 1 = Present)
+   = presence of obstructive pneumonitis/atelectais
+   (Logical: 0=Absent, 1=Present)
 5. Necrosis
-   (Class: 0 = Nothing, 1 = Necrosis, 2 = Cavitization)
+   (Class: 0=Nothing, 1=Necrosis, 2=Cavitization)
 6. Underlying_lung
    = Underlying lung disease
-   (Class: 0 = No Remarkable, 1 = Emphysema, 2 = Interstitial lung abnormality)
+   (Class: 0=No Remarkable, 1=Emphysema, 2=Interstitial lung abnormality)
 7. Effusion
-   (Logical: 0 = Absent, 1 = Present)
+   (Logical: 0=Absent, 1=Present)
 
 ## Clinicopathologic features: TO BE COMPLETED
 
 8. Sex
-
+   = 
 9. Age
-
+   = 
 10. LN_ratio
     = lymph node ratio: number of nodes with positive tumor cells divided by the number of all resected nodes
 11. cT
+    = central / size of original tumor
+    (Class: 1=T1, 2=T2, 3=T3, 4=T4)
 12. cN
+    = central / nearby lymph nodes involved
+    (Class: 1=N0, 2=N1, 3=N2, 4=N3)
 13. cM
+    = central / distant metastasis (spread of cancer from one part of the body to another)
+    (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
 14. pT
     = peripheral / size of original tumor
+    (Class: 1=T1, 2=T2, 3=T3, 4=T4)
 15. pN
     = peripheral / nearby lymph nodes involved
+    (Class: 1=N0, 2=N1, 3=N2, 4=N3)
 16. pM
     = peripheral / distant metastasis (spread of cancer from one part of the body to another)
+    (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
 17. Smoking_state
+    = 
 18. FEV1_FVC
-    = pulmonary function test: forced expiratory volume in a second / forced vital capacity
+    = pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
 19. CEA
-    = serum carcinoembryonic antigen (tumor marker)
+    = serum carcinoembryonic antigen in ng/ml (tumor marker)
 20. op_type
+    =
 21. meta
     = metastasis observed
+    (Logical: 0=Absent, 1=Present)
 
 
-# Part 1: Test relationship between radiologic/clinicopathologic features and death (Not consider survival duration)
+# Part 1: Test relationship between radiologic/clinicopathologic features and death (not considering survival duration)
 
 Methods used:
 1. Fisher's exact test (determine the relationship between two categorical variables)
@@ -186,8 +206,8 @@ Methods used:
 Determine the relationship between two categorical variables
 
 Hypotheses:
-H0: There is no relationship between the two categorical variables
-H1 : The variables are dependent. Knowing the value of one variable helps to predict the value of the other variable 
+H0: there is no relationship between the two categorical variables.
+H1: the variables are dependent. Knowing the value of one variable helps to predict the value of the other variable.
 
 Odds ratio:
 Odds for death in patient with specific condition
@@ -195,7 +215,7 @@ divided by odds for death in patient without specific condition
 If those 2 sets of patient have equal odds (odds ratio = 1), that specific condition are independent to death status
 
 
-Here we want to define
+Here we want to define:
 1. Diffence in risk of death in patient with and without obstructive pneumonitis/ atelectais
 2. Diffence in risk of death in patient with and without lung effusion
 
@@ -288,6 +308,23 @@ Risk of death of lung cancer patients with ILA is 6 times higher than patient wi
 
 ## Relationship between clinicopathologic features and death
 
+### Fisher's exact test
+
+Determine the relationship between two categorical variables
+
+Hypotheses:
+H0: there is no relationship between the two categorical variables.
+H1: the variables are dependent. Knowing the value of one variable helps to predict the value of the other variable.
+
+Odds ratio:
+Odds for death in patient with specific condition
+divided by odds for death in patient without specific condition
+If those 2 sets of patient have equal odds (odds ratio = 1), that specific condition are independent to death status
+
+Here we want to define:
+1. Diffence in risk of death in patient with and without obstructive pneumonitis/ atelectais
+2. Diffence in risk of death in patient with and without lung effusion
 
 
+# Part 2:
 
