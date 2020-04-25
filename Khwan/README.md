@@ -1,1 +1,1 @@
-Just folder to keep all my code 
+Just a folder that keeps my code 
