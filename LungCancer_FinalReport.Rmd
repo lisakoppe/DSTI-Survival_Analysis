@@ -135,7 +135,7 @@ lungSCC <- mutate(lungSCC_raw,
 
 1. Location
    = tumor location
-   (Class: 0=Invisible, 1=Central SCC, 2=Peripheral SCC)
+   (Class: 0=Peripheral SCC, 1=Central SCC)
 2. death
    (Logical: 0=Alive, 1=Dead)
 3. OS
@@ -226,8 +226,8 @@ with(lungSCC, fisher.test(table(death, Obst_pn_or_plugging)))
 Interpretation:
 p-value is higher than the significance level of 5%, therefore; we cannot reject null hypothesis which means data not sufficient to prove that obstructive pneumonitis/ atelectais effect the death.
 
-Odds ratio suggests that patients with obstructive pneumonitis/ atelectais have approximately 17% lower risk of death than that of patient without obstructive pneumonitis/ atelectais
-See that 95% confidence interval ranges from 0.55, where patients with pneumonitis/atelectais have 5% lower risk of death than patients without this condition, to 1.25 which means they have 25% higher risk of death than another group of patient.
+Odds ratio suggests that patients with obstructive pneumonitis/ atelectais have approximately 19% lower risk of death than that of patient without obstructive pneumonitis/ atelectais
+See that 95% confidence interval ranges from 0.54, where patients with pneumonitis/atelectais have around 5% lower risk of death than patients without this condition, to 1.24 which means they have 24% higher risk of death than another group of patient.
 (Correlate with publication, this feature is suprisingly improve the survival time)
 
 
@@ -257,18 +257,15 @@ summary(fit)
 ```
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The negative value of estimate coefficient of LocationInvisible indicates that invisible lung cancer has negative correlation with risk of death.
-3. Odds of patient with invisible lung cancer is lower than odds of central lung cancer patients.
-To see the odds ratio between these 2 condition, we have to exponent this coefficients (see belows).
-4. The presence of peripheral lung cancer has positive relationship with death.
-5. Odds of peripheral lung cancer is higher than that of central lung cancer
+2. The positive value of estimate coefficient indicates the positive relationship between peripheral lung cancer and risk of death.
+3. Odds of peripheral lung cancer is lower than odds of central lung cancer. 
+To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
 
 ```{r}
-exp(-0.3203)
 exp(0.2749)
 ```
 Interpretation:
-Risk of death of patients who have invisible lung cancer is around 30% lower than patients with central lung cancer, while risk of death of peripheral lung cancer patients is around 30% higher than that of central lung cancer patients.
+Risk of death of patients who have peripheral lung cancer is around 30% higher than patients with central lung cancer
 
 
 2. Difference in risk of death based on cell necrosis:
@@ -277,12 +274,12 @@ fit <- glm(death~Necrosis, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. No cell necrosis observation shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0238 (i.e No necrosis reduces risk of death).
+1. No cell necrosis observation shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
 2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
 
 ```{r}
 exp(-0.7482)
-exp(-0.9840)
+exp(-0.9776)
 ```
 Interpretation:
 Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  63% lower than patients with cavitization.
@@ -294,15 +291,16 @@ fit <- glm(death~Underlying_lung, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.006.
-2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema.
+1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.007.
+2. No underlying lung disease has statistically significant negative relationship with the risk of death with p-value 0.09
+2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema. 
 
 ```{r}
 exp(1.81475)
 exp(-0.45911)
 ```
 Interpretation:
-Risk of death of lung cancer patients with ILA is 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
+Risk of death of lung cancer patients with ILA is almost 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
 
 
 ## Relationship between clinicopathologic features and death
