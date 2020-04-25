@@ -27,7 +27,7 @@ library(tidyr)
 
 # CAREFUL: NEED TO REVIEW DATA TYPES (ESPECIALLY LOGICAL)
 
-lungSCC_raw <- read_csv("LungCancer.csv", 
+lungSCC_raw <- read_csv("LungCancer.csv",
                         col_types=cols(Index='c',
                                        Sex='c',
                                        Age='d',
@@ -124,10 +124,10 @@ Define the meaning of each label to make it easier for interpretation
 lungSCC <- mutate(lungSCC_raw,
                   Location=ifelse(Location==0, "Invisible",
                                   ifelse(Location==1, "Central", "Peripheral")),
-               
+
                   Necrosis=ifelse(Necrosis==0, "NoRemark",
                                   ifelse(Necrosis==1, "Necrosis", "Cavitization")),
-               
+
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
                                          ifelse(Underlying_lung==1, "Emphysema", "ILA")))
 ```
@@ -141,7 +141,7 @@ lungSCC <- mutate(lungSCC_raw,
    (Logical: 0=Alive, 1=Dead)
 3. OS
    = Overall Survival in months: interval between the date of diagnosis and date of death (by any cause)
-    
+
 ## Radiologic features:
 
 4. Obst_pn_or_plugging
@@ -158,9 +158,9 @@ lungSCC <- mutate(lungSCC_raw,
 ## Clinicopathologic features: TO BE COMPLETED
 
 8. Sex
-   = 
+   =
 9. Age
-   = 
+   =
 10. LN_ratio
     = lymph node ratio: number of nodes with positive tumor cells divided by the number of all resected nodes
 11. cT
@@ -182,7 +182,7 @@ lungSCC <- mutate(lungSCC_raw,
     = peripheral / distant metastasis (spread of cancer from one part of the body to another)
     (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
 17. Smoking_state
-    = 
+    =
 18. FEV1_FVC
     = pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
 19. CEA
@@ -225,7 +225,7 @@ If those 2 sets of patient have equal odds (odds ratio = 1), that specific condi
 with(lungSCC, fisher.test(table(death, Obst_pn_or_plugging)))
 ```
 Interpretation:
-p-value is higher than the significance level of 5%, therefore; we cannot reject null hypothesis which means data not sufficient to prove that obstructive pneumonitis/ atelectais effect the death. 
+p-value is higher than the significance level of 5%, therefore; we cannot reject null hypothesis which means data not sufficient to prove that obstructive pneumonitis/ atelectais effect the death.
 
 Odds ratio suggests that patients with obstructive pneumonitis/ atelectais have approximately 17% lower risk of death than that of patient without obstructive pneumonitis/ atelectais
 See that 95% confidence interval ranges from 0.55, where patients with pneumonitis/atelectais have 5% lower risk of death than patients without this condition, to 1.25 which means they have 25% higher risk of death than another group of patient.
@@ -258,7 +258,7 @@ summary(fit)
 ```
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The negative value of estimate coefficient of LocationInvisible indicates that invisible lung cancer has negative correlation with risk of death. 
+2. The negative value of estimate coefficient of LocationInvisible indicates that invisible lung cancer has negative correlation with risk of death.
 3. Odds of patient with invisible lung cancer is lower than odds of central lung cancer patients.
 To see the odds ratio between these 2 condition, we have to exponent this coefficients (see belows).
 4. The presence of peripheral lung cancer has positive relationship with death.
@@ -296,7 +296,7 @@ summary(fit)
 ```
 Interpretation:
 1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.006.
-2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema. 
+2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema.
 
 ```{r}
 exp(1.81475)
@@ -461,4 +461,3 @@ exp(-0.003048)
 
 
 # Part 2:
-
