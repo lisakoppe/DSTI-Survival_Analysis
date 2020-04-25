@@ -225,7 +225,7 @@ If those 2 sets of patient have equal odds (odds ratio = 1), that specific condi
 with(lungSCC, fisher.test(table(death, Obst_pn_or_plugging)))
 ```
 Interpretation:
-p-value is higher than the significance level of 5%, therefore; we cannot reject null hypothesis which means data not sufficinet to prove that obstructive pneumonitis/ atelectais effect the death. 
+p-value is higher than the significance level of 5%, therefore; we cannot reject null hypothesis which means data not sufficient to prove that obstructive pneumonitis/ atelectais effect the death. 
 
 Odds ratio suggests that patients with obstructive pneumonitis/ atelectais have approximately 17% lower risk of death than that of patient without obstructive pneumonitis/ atelectais
 See that 95% confidence interval ranges from 0.55, where patients with pneumonitis/atelectais have 5% lower risk of death than patients without this condition, to 1.25 which means they have 25% higher risk of death than another group of patient.
@@ -258,9 +258,11 @@ summary(fit)
 ```
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The negative value of estimate coefficient of LocationInvisible indicates that odds of invisible lung cancer is lower than odds of central lung cancer. 
+2. The negative value of estimate coefficient of LocationInvisible indicates that invisible lung cancer has negative correlation with risk of death. 
+3. Odds of patient with invisible lung cancer is lower than odds of central lung cancer patients.
 To see the odds ratio between these 2 condition, we have to exponent this coefficients (see belows).
-3. Odds of peripheral lung cancer is higher than that of central lung cancer
+4. The presence of peripheral lung cancer has positive relationship with death.
+5. Odds of peripheral lung cancer is higher than that of central lung cancer
 
 ```{r}
 exp(-0.3203)
@@ -325,9 +327,15 @@ X. Difference in risk of death in patient with and without observed metastasis a
 
 X. Difference in risk of death in patient with and without observed metastasis after surgery (meta):
 ```{r}
+with(lungSCC, table(death, meta))
 with(lungSCC, fisher.test(table(death, meta)))
 ```
-Interpretation: TODO
+Interpretation:
+The p-value is way lower than the significant level of 5% (p-value = 1.61e-10) the variables are closely dependent. Data is sufficient to prove that the observation of metastasis after surgery increases the risk leading to death.
+We can then reject the null hypothesis.
+
+The odds ratio (3.8195) suggests that patients with observed metastasis after surgery have approximately 282% higher risk of death than patients without any metastasis observed.
+95% confidence interval ranges from 2.46 to 5.96.
 
 
 ### Logistic regression
@@ -345,82 +353,109 @@ X. Difference in risk of death based on CEA serum
 
 X. Difference in risk of death based on lymph node ratio:
 ```{r}
+with(lungSCC, table(death, LN_ratio))
 fit <- glm(death~LN_ratio, family="binomial", data=lungSCC)
 summary(fit)
 ```
-Interpretation: TODO
+Interpretation:
+1. The coefficient is positive (1.39) which means that there is a positive association between the lymph node ratio and the risk of death.
+2. p-value (0.02) remains small so this relationship is slightly significant.
+3. Odds ratio doen't give any information here because of the continuous type of this variable.
 
 ```{r}
-exp(1.3897)
+# TRY TO SPLIT INTO RANGES
+fit <- glm(death~I(LN_ratio/4), family="binomial", data=lungSCC)
+summary(fit)
 ```
-Interpretation: TODO
+
+```{r}
+exp(5.5588)
+```
+Interpretation: odds ratio
+
 
 X. Difference in risk of death based on pT peripheral tumor size:
 ```{r}
+with(lungSCC, table(death, pT))
 fit <- glm(death~pT, family="binomial", data=lungSCC)
 summary(fit)
 ```
-Interpretation: TODO
+Interpretation:
+1. pT3 tumor size shows significantly positive relationship with the risk of death with p-value 0.004.
 
 ```{r}
 exp(0.4321)
 exp(0.9573)
 exp(1.2622)
 ```
-Interpretation: TODO
+Interpretation:
+1. The risk of death of patients who have a tumor of pT2 size type is 54% higher than for patients whose tumor has pT1 size type.
+2. The risk of death of patients who have a tumor of pT3 size type is 160% higher than for patients whose tumor has pT1 size type.
+3. The risk of death of patients who have a tumor of pT4 size type is 253% higher than for patients whose tumor has pT1 size type.
+
 
 X. Difference in risk of death based on pN peripheral tumor size:
 ```{r}
+with(lungSCC, table(death, pN))
 fit <- glm(death~pN, family="binomial", data=lungSCC)
 summary(fit)
 ```
-Interpretation: TODO
+Interpretation:
+1. pN2 tumor size shows a highly significant positive relationship with the risk of death with p-value 0.0002.
 
 ```{r}
 exp(0.2270)
 exp(1.1673)
 exp(1.6010)
 ```
-Interpretation: TODO
+Interpretation:
+1. The risk of death of patients who have a tumor of pN1 size type is 25% higher than for patients whose tumor has pN0 size type.
+2. The risk of death of patients who have a tumor of pN2 size type is 221% higher than for patients whose tumor has pN0 size type.
+3. The risk of death of patients who have a tumor of pN3 size type is 396% higher than for patients whose tumor has pN0 size type.
+
 
 X. Difference in risk of death based on pM peripheral tumor size:
 ```{r}
+with(lungSCC, table(death, pM))
 fit <- glm(death~pM, family="binomial", data=lungSCC)
 summary(fit)
 ```
-Interpretation: TODO
+Interpretation:
+1. There is no significant relationship between the pM tumor size and the prediction of death status (p-value = 0.98).
 
 ```{r}
 exp(15.8683)
 ```
-Interpretation: TODO
+
 
 X. Difference in risk of death based on FEV1_FVC pulmonary function test:
 ```{r}
+with(lungSCC, table(death, FEV1_FVC))
 fit <- glm(death~FEV1_FVC, family="binomial", data=lungSCC)
 summary(fit)
 ```
-Interpretation: TODO
+Interpretation:
+1. There is no significant relationship between the pulmonary function test FEV1_FVC and the prediction of death status (p-value = 0.21).
+2. Odds ratio doen't give any information here because of the continuous type of this variable.
 
 ```{r}
 exp(0.011102)
 ```
-Interpretation: TODO
+
 
 X. Difference in risk of death based on CEA serum:
 ```{r}
+with(lungSCC, table(death, CEA))
 fit <- glm(death~CEA, family="binomial", data=lungSCC)
 summary(fit)
 ```
-Interpretation: TODO
+Interpretation:
+1. There is no significant relationship between the CEA serum and the prediction of death status (p-value = 0.58).
+2. Odds ratio doen't give any information here because of the continuous type of this variable.
 
 ```{r}
 exp(-0.003048)
 ```
-Interpretation: TODO
-
-
-
 
 
 
