@@ -122,9 +122,8 @@ Define the meaning of each label to make it easier for interpretation
 # TO BE COMPLETED
 
 lungSCC <- mutate(lungSCC_raw,
-                  Location=ifelse(Location==0, "Invisible",
-                                  ifelse(Location==1, "Central", "Peripheral")),
-
+                  Location=ifelse(Location==0, "Peripheral","Central"),
+                                 
                   Necrosis=ifelse(Necrosis==0, "NoRemark",
                                   ifelse(Necrosis==1, "Necrosis", "Cavitization")),
 
@@ -136,7 +135,7 @@ lungSCC <- mutate(lungSCC_raw,
 
 1. Location
    = tumor location
-   (Class: 0=Invisible, 1=Central SCC, 2=Peripheral SCC)
+   (Class: 0=Peripheral SCC, 1=Central SCC)
 2. death
    (Logical: 0=Alive, 1=Dead)
 3. OS
@@ -186,7 +185,7 @@ lungSCC <- mutate(lungSCC_raw,
 18. FEV1_FVC
     = pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
 19. CEA
-    = serum carcinoembryonic antigen in ng/ml (tumor marker)
+    = serum carcinoembryonic antigen level in ng/ml (tumor marker)
 20. op_type
     =
 21. meta
@@ -227,8 +226,8 @@ with(lungSCC, fisher.test(table(death, Obst_pn_or_plugging)))
 Interpretation:
 p-value is higher than the significance level of 5%, therefore; we cannot reject null hypothesis which means data not sufficient to prove that obstructive pneumonitis/ atelectais effect the death.
 
-Odds ratio suggests that patients with obstructive pneumonitis/ atelectais have approximately 17% lower risk of death than that of patient without obstructive pneumonitis/ atelectais
-See that 95% confidence interval ranges from 0.55, where patients with pneumonitis/atelectais have 5% lower risk of death than patients without this condition, to 1.25 which means they have 25% higher risk of death than another group of patient.
+Odds ratio suggests that patients with obstructive pneumonitis/ atelectais have approximately 19% lower risk of death than that of patient without obstructive pneumonitis/ atelectais
+See that 95% confidence interval ranges from 0.54, where patients with pneumonitis/atelectais have around 5% lower risk of death than patients without this condition, to 1.24 which means they have 24% higher risk of death than another group of patient.
 (Correlate with publication, this feature is suprisingly improve the survival time)
 
 
@@ -258,18 +257,15 @@ summary(fit)
 ```
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The negative value of estimate coefficient of LocationInvisible indicates that invisible lung cancer has negative correlation with risk of death.
-3. Odds of patient with invisible lung cancer is lower than odds of central lung cancer patients.
-To see the odds ratio between these 2 condition, we have to exponent this coefficients (see belows).
-4. The presence of peripheral lung cancer has positive relationship with death.
-5. Odds of peripheral lung cancer is higher than that of central lung cancer
+2. The positive value of estimate coefficient indicates the positive relationship between peripheral lung cancer and risk of death.
+3. Odds of peripheral lung cancer is lower than odds of central lung cancer. 
+To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
 
 ```{r}
-exp(-0.3203)
 exp(0.2749)
 ```
 Interpretation:
-Risk of death of patients who have invisible lung cancer is around 30% lower than patients with central lung cancer, while risk of death of peripheral lung cancer patients is around 30% higher than that of central lung cancer patients.
+Risk of death of patients who have peripheral lung cancer is around 30% higher than patients with central lung cancer
 
 
 2. Difference in risk of death based on cell necrosis:
@@ -278,12 +274,12 @@ fit <- glm(death~Necrosis, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. No cell necrosis observation shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0238 (i.e No necrosis reduces risk of death).
+1. No cell necrosis observation shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
 2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
 
 ```{r}
 exp(-0.7482)
-exp(-0.9840)
+exp(-0.9776)
 ```
 Interpretation:
 Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  63% lower than patients with cavitization.
@@ -295,15 +291,16 @@ fit <- glm(death~Underlying_lung, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.006.
-2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema.
+1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.007.
+2. No underlying lung disease has statistically significant negative relationship with the risk of death with p-value 0.09
+2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema. 
 
 ```{r}
 exp(1.81475)
 exp(-0.45911)
 ```
 Interpretation:
-Risk of death of lung cancer patients with ILA is 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
+Risk of death of lung cancer patients with ILA is almost 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
 
 
 ## Relationship between clinicopathologic features and death
@@ -331,11 +328,11 @@ with(lungSCC, table(death, meta))
 with(lungSCC, fisher.test(table(death, meta)))
 ```
 Interpretation:
-The p-value is way lower than the significant level of 5% (p-value = 1.61e-10) the variables are closely dependent. Data is sufficient to prove that the observation of metastasis after surgery increases the risk leading to death.
+The p-value is way lower than the significant level of 5% (p-value = 8.52e-10) the variables are closely dependent. Data is sufficient to prove that the observation of metastasis after surgery increases the risk leading to death.
 We can then reject the null hypothesis.
 
-The odds ratio (3.8195) suggests that patients with observed metastasis after surgery have approximately 282% higher risk of death than patients without any metastasis observed.
-95% confidence interval ranges from 2.46 to 5.96.
+The odds ratio (3.65) suggests that patients with observed metastasis after surgery have approximately 265% higher risk of death than patients without any metastasis observed.
+95% confidence interval ranges from 2.35 to 5.72.
 
 
 ### Logistic regression
@@ -358,8 +355,8 @@ fit <- glm(death~LN_ratio, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. The coefficient is positive (1.39) which means that there is a positive association between the lymph node ratio and the risk of death.
-2. p-value (0.02) remains small so this relationship is slightly significant.
+1. The coefficient is positive (1.38) which means that there is a positive association between the lymph node ratio and the risk of death.
+2. p-value (0.02) remains small so this relationship is slightly significant. #ADD CI
 3. Odds ratio doen't give any information here because of the continuous type of this variable.
 
 ```{r}
@@ -369,7 +366,7 @@ summary(fit)
 ```
 
 ```{r}
-exp(5.5588)
+exp(5.5298)
 ```
 Interpretation: odds ratio
 
@@ -381,17 +378,17 @@ fit <- glm(death~pT, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. pT3 tumor size shows significantly positive relationship with the risk of death with p-value 0.004.
+1. pT3 tumor size shows significantly positive relationship with the risk of death with p-value 0.005.
 
 ```{r}
-exp(0.4321)
-exp(0.9573)
-exp(1.2622)
+exp(0.4370)
+exp(0.9622)
+exp(1.2672)
 ```
 Interpretation:
-1. The risk of death of patients who have a tumor of pT2 size type is 54% higher than for patients whose tumor has pT1 size type.
-2. The risk of death of patients who have a tumor of pT3 size type is 160% higher than for patients whose tumor has pT1 size type.
-3. The risk of death of patients who have a tumor of pT4 size type is 253% higher than for patients whose tumor has pT1 size type.
+1. The risk of death of patients who have a tumor of pT2 size type is 55% higher than for patients whose tumor has pT1 size type.
+2. The risk of death of patients who have a tumor of pT3 size type is 162% higher than for patients whose tumor has pT1 size type.
+3. The risk of death of patients who have a tumor of pT4 size type is 255% higher than for patients whose tumor has pT1 size type.
 
 
 X. Difference in risk of death based on pN peripheral tumor size:
@@ -401,17 +398,17 @@ fit <- glm(death~pN, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. pN2 tumor size shows a highly significant positive relationship with the risk of death with p-value 0.0002.
+1. pN2 tumor size shows a highly significant positive relationship with the risk of death with p-value 0.0003.
 
 ```{r}
-exp(0.2270)
-exp(1.1673)
-exp(1.6010)
+exp(0.2224)
+exp(1.1628)
+exp(1.5965)
 ```
 Interpretation:
 1. The risk of death of patients who have a tumor of pN1 size type is 25% higher than for patients whose tumor has pN0 size type.
-2. The risk of death of patients who have a tumor of pN2 size type is 221% higher than for patients whose tumor has pN0 size type.
-3. The risk of death of patients who have a tumor of pN3 size type is 396% higher than for patients whose tumor has pN0 size type.
+2. The risk of death of patients who have a tumor of pN2 size type is 220% higher than for patients whose tumor has pN0 size type.
+3. The risk of death of patients who have a tumor of pN3 size type is 393% higher than for patients whose tumor has pN0 size type.
 
 
 X. Difference in risk of death based on pM peripheral tumor size:
@@ -421,10 +418,10 @@ fit <- glm(death~pM, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. There is no significant relationship between the pM tumor size and the prediction of death status (p-value = 0.98).
+1. There is no relationship between the pM tumor size and the prediction of death status (p-value = 0.98).
 
 ```{r}
-exp(15.8683)
+exp(15.8626)
 ```
 
 
@@ -439,7 +436,7 @@ Interpretation:
 2. Odds ratio doen't give any information here because of the continuous type of this variable.
 
 ```{r}
-exp(0.011102)
+exp(0.011147)
 ```
 
 
@@ -454,10 +451,16 @@ Interpretation:
 2. Odds ratio doen't give any information here because of the continuous type of this variable.
 
 ```{r}
-exp(-0.003048)
+exp(-0.003081)
 ```
 
 
 
 
-# Part 2:
+# Part 2: Test relationship between radiologic/clinicopathologic features and survival time
+
+Methods used:
+
+## Relationship between radiologic features and survival time
+
+## Relationship between clinicopathologic features and survival time
