@@ -123,12 +123,24 @@ Define the meaning of each label to make it easier for interpretation
 
 lungSCC <- mutate(lungSCC_raw,
                   Location=ifelse(Location==0, "Peripheral","Central"),
-                                 
+                  
                   Necrosis=ifelse(Necrosis==0, "NoRemark",
                                   ifelse(Necrosis==1, "Necrosis", "Cavitization")),
 
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
-                                         ifelse(Underlying_lung==1, "Emphysema", "ILA")))
+                                         ifelse(Underlying_lung==1, "Emphysema", "ILA")),
+                  
+                  cT = factor(cT, levels = c("1", "2", "3", "4"), labels = c("cT1", "cT2", "cT3", "cT4")),
+                  
+                  cN = factor(cN, levels = c("1", "2", "3", "4"), labels = c("cN0", "cN1", "cN2", "cN3")),
+                  
+                  cM = factor(cM, levels = c("1", "3"), labels = c("cM0", "cM1b")),
+                  
+                  pT = factor(pT, levels = c("1", "2", "3", "4"), labels = c("pT1", "pT2", "pT3", "pT4")),
+                  
+                  pN = factor(pN, levels = c("1", "2", "3", "4"), labels = c("pN0", "pN1", "pN2", "pN3")),
+                  
+                  pM = factor(pM, levels = c("1", "3"), labels = c("pM0", "pM1b")))
 ```
 
 # Features description
