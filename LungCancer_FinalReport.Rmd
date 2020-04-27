@@ -281,6 +281,20 @@ Interpretation:
 No relationship between death and lung effusion (p-value = 1)
 Patients with lung effusion have 5% higher risk of death than patients without lung effusion
 
+3. Difference in risk of death in patient with Age less than and over 60:
+```{r}
+with(lungSCC, fisher.test(table(death, AG)))
+```
+Interpretation:
+With p-value = 0.002378 less than the significance level, we can reject null hypothsis and can conclue that person with age more than 60 years have 4 times higher chances of dying than the younger people
+
+4. Difference in risk of death in patient based on gender
+```{r}
+with(lungSCC, fisher.test(table(death, Sex)))
+
+```
+Interpretation:
+As the p-value is 0.5974 , we can conclude that chances of death is independent of gender 
 
 ### Logistic regression
 
