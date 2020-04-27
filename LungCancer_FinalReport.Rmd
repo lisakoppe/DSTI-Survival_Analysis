@@ -23,7 +23,7 @@ library(survminer)
 
 lungSCC_raw <- read_csv("LungCancer.csv",
                          col_types=cols(Sex='c',
-                                       Age='d',
+                                       Age='c',
                                        Location='d',
                                        Obst_pn_or_plugging='d',
                                        Necrosis='d',
@@ -39,7 +39,7 @@ lungSCC_raw <- read_csv("LungCancer.csv",
                                        Smoking_state='c',  
                                        FEV1_FVC='d',
                                        CEA='d',
-                                       op_type='d',
+                                       op_type='c',
                                        death='d',
                                        OP_site_recur='l',
                                        meta='l',
@@ -115,9 +115,7 @@ lungSCC <- mutate(lungSCC_raw,
                   AG=factor(AG),
                 
                   OP=factor(op_type, labels=c("lobectomy", "pneumonectomy", "segmentectomy", "LN biopsy", "No OP")),
-                 
-                  Multiplicity=factor(Multiplicity, labels=c("absent", "present")),
-                  
+                                                  
                   Smoking_state=factor(Smoking_state, labels=c("unknown", "current-smoker", "ex- smoker", "non- smoker")),
                   
                   cT=factor(cT, levels=c("1", "2", "3", "4"), labels=c("cT1", "cT2", "cT3", "cT4")),
@@ -132,6 +130,14 @@ lungSCC <- mutate(lungSCC_raw,
                   
                   pM=factor(pM, levels=c("1", "3"), labels=c("pM0", "pM1b")))
 ```
+
+Recheck the distribution of age after regrouped
+```{r}
+table(lungSCC$AG)
+```
+
+
+
 
 # Features description
 
@@ -167,8 +173,9 @@ lungSCC <- mutate(lungSCC_raw,
    = gender of the patient
    (Class: F=Female, M=Male)
    
-9. Age
-   = age of the person 
+9. AG
+   = age at diagnosis
+   (Class: LT60 = Lower than 60 years old, OV60 = Over than 60 years old)
    
 10. LN_ratio
     = lymph node ratio: number of nodes with positive tumor cells divided by the number of all resected nodes
@@ -199,7 +206,7 @@ lungSCC <- mutate(lungSCC_raw,
     
 17. Smoking_state
     = current smoking state of the patient
-    (Class: 0=Unknown, 1=Current, 2=Ex, 3=Non)
+    (Class: current-smoker, ex-smoker, non-smoker, unknown)
     
 18. FEV1_FVC
     = pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
@@ -207,9 +214,9 @@ lungSCC <- mutate(lungSCC_raw,
 19. CEA
     = serum carcinoembryonic antigen level in ng/ml (tumor marker)
     
-20. op_type
+20. OP
     = type of operation the person has undergone
-    (Class: 1=Lobectomy, 2=Pneumonectomy, 3=Segmentectomy, 4=LN biopsy, 5=No Op)
+    (Class: lobectomy, pneumonectomy, segmentectomy, LN biopsy, no Op)
     
 21. meta
     = metastasis observed
