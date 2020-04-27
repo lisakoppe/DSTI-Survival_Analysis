@@ -124,6 +124,22 @@ lungSCC <- mutate(lungSCC_raw,
 
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
                                          ifelse(Underlying_lung==1, "Emphysema", "ILA")),
+                  Sex = factor(Sex, levels = c("F", "M")),
+                  
+                  AG = ifelse((Age < 60), "LT60", "OV60"),
+          
+                  AG = factor(AG),
+                
+                  OP = factor(op_type,labels = c("lobectomy","pneumonectomy","segmentectomy","LN biopsy","No OP")),
+                 
+                  Multiplicity = factor(Multiplicity,labels=c("absent","present")),
+                  
+                  cT = factor(cT,labels=c("T1","T2","T3","T4")),
+                 
+                  cN = factor(cT,labels=c("N0","N1","N2","N3")),
+          
+                  Smoking_state = factor(Smoking_state,labels = c("unknown","current-smoker","ex- smoker",
+                                                                  "non- smoker")),
                   
                   cT = factor(cT, levels = c("1", "2", "3", "4"), labels = c("cT1", "cT2", "cT3", "cT4")),
                   
@@ -480,6 +496,95 @@ Interpretation:
 ```{r}
 exp(-0.003081)
 ```
+
+Difference in risk of death based on Operation undergone : 
+```{r}
+summary(glm(death ~ OP, data = lungcancer_PC, family = "binomial"))
+summary(fit)
+```
+
+```{r}
+exp(2.0974)
+
+```
+Interpretation :
+1.We can see that No operation ,pneumonectomy and PLN biopsy has postive effect on death while segmentectomy has negative effect 
+2.LN biopsy has significant relation with the prediction of death with p-value : 0.006946
+3. The odds ratio states that person who has undergone  LN biopsyhas 714% chances of death as compared to person undergone lobectomy 
+
+
+
+Difference in risk of death based on smoking state : 
+```{r}
+summary(glm(death ~ Smoking_state, data = lungcancer_PC, family = "binomial"))
+summary(fit)
+
+```
+Interpretation : 
+1.Being a current smoker , ex smoker and non smoker has negative association with death .
+2.No significant relation between Smoking State and death
+
+Difference in risk of death based on Central Lung SCC size of Tumor : 
+```{r}
+summary(glm(death ~ cT, data = lungcancer_PC, family = "binomial"))
+summary(fit)
+```
+
+```{r}
+exp(0.5702)
+
+exp(1.4731)
+
+exp(1.3122)
+```
+Interpretations: 
+1.All the tumor size have positive association with the risk of death
+2. Tumor size T2 has 76% more chances of death as compaed to T1
+3. Tumor size T3 has 336% more chances of death as compaed to T1
+4. Tumor size T4 has 271% more chances of death as compaed to T1
+5. Patient with Central SSC tumor size of T3 has the highest risk of death 
+
+
+
+Difference in risk of death when Nearby lymph nodes that are involved : 
+```{r}
+summary(glm(death ~ cN, data = lungcancer_PC, family = "binomial"))
+summary(fit)
+```
+
+
+```{r}
+exp(0.5702)
+
+exp(1.4731)
+
+exp(1.3122)
+
+```
+
+
+Interpretations: 
+1.All the tumor size have positive association with the risk of death
+2. Proximity of N1 lymph nodes has 76% more chances of death as compared to N0
+3. Proximity of N2 lymph nodes has 336% more chances of death as compared to N0
+4. Proximity of N3 lymph nodes has 271% more chances of death as compared to N0
+5. Patient with Proximity of N2 lymph nodes has the highest risk of death 
+
+
+
+Difference in risk of death when Distant metastasis (spread of cancer from one part of the body to another) are involved : 
+```{r}
+summary(glm(death ~ cM, data = lungcancer_PC, family = "binomial"))
+summary(fit)
+
+```
+
+```{r}
+exp(0.2744)
+```
+Interpretations:
+1.All Distant metastasis  have positive association with the risk of death
+2.M3 Distant metastasis  has 31 % higher chances of risk of death as compared to M1 
 
 
 # Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)
