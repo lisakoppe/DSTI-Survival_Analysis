@@ -590,3 +590,9 @@ summary(fit_CEA)
 ```
 Interpretation
 
+
+# Part 3: Kaplan-Meyer estimator with features which have a significant relationship with survival time (OS)
+
+
+
+
