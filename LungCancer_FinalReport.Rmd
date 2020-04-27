@@ -19,25 +19,21 @@ library(survminer)
 # Data preparation: load the lung cancer dataset and check data types
 
 ```{r}
+<<<<<<< HEAD
+=======
+
+# CAREFUL: NEED TO REVIEW DATA TYPES (ESPECIALLY LOGICAL)
+
+# Note: Check only data type of columns that we want to work with since we have set the default for the remaining as c already
+>>>>>>> de0e8616c6a028d8fa1acc6a4ca4581fadf08180
 lungSCC_raw <- read_csv("LungCancer.csv",
-                        col_types=cols(Index='c',
-                                       Sex='c',
+                         col_types=cols(Sex='c',
                                        Age='d',
                                        Location='d',
                                        Obst_pn_or_plugging='d',
-                                       CT_value_Mean='d',
-                                       CT_value_Std_Dev='d',
-                                       CT_value_P_major='d',
-                                       CT_V_ratio='d',
-                                       CT_Kernel='c',
-                                       Necrosis='c',
-                                       Underlying_lung='c',
-                                       Multiplicity='l',
-                                       Effusion='l',
-                                       Bronchoscopy='c',
-                                       Differentiation='c',
-                                       pos_LN='c',
-                                       total_LN='d',
+                                       Necrosis='d',
+                                       Underlying_lung='d',
+                                       Effusion='d',
                                        LN_ratio='d',
                                        cT='c',
                                        cN='c',
@@ -45,27 +41,25 @@ lungSCC_raw <- read_csv("LungCancer.csv",
                                        pT='c',
                                        pN='c',
                                        pM='c',
-                                       Smoking_state='c',
-                                       PY='d',
-                                       Cessation_time='d',
-                                       FVCpercentPRED='d',
-                                       FEV1percentPRED='d',
+                                       Smoking_state='c',  
                                        FEV1_FVC='d',
                                        CEA='d',
-                                       post_opCTx='l',
-                                       post_op_RTx='l',
-                                       op_type='c',
+                                       op_type='d',
                                        death='d',
-                                       recur_or_meta='l',
                                        OP_site_recur='l',
                                        meta='l',
-                                       meta_site='c',
-                                       OS='d',
-                                       DFS='d',
+                                       OS = "d",
                                        .default = 'c'))
 ```
 
 Explore the dataset
+# Note: Be careful about the interpretation of this chunk
+since some features are divided in class by number 
+For example, Necrosis is divided into 3 classes; normal = 0, necrosis =  1, cavitization = 2
+If we run this chunk we will get, mean of necrosis = 0.4171 >> Not the real data distribution of necrosis
+Therefore, the summary is useful for columns with the real numerical data only (age for example)
+
+To observe the distribution of features that use number to classify their classes, use command "table" as indicated in the next chunck of code
 
 ```{r}
 names(lungSCC_raw)
@@ -82,7 +76,7 @@ Count null value in decimal column (OS)
 ```{r}
 table(lungSCC_raw$Location, useNA="always")
 table(lungSCC_raw$death, useNA="always")
-sum(is.na(lungSCC_raw$death))
+
 
 # Radiologic features
 table(lungSCC_raw$Obst_pn_or_plugging, useNA="always")
