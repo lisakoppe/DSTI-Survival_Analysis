@@ -134,9 +134,7 @@ lungSCC <- mutate(lungSCC_raw,
                  
                   Multiplicity = factor(Multiplicity,labels=c("absent","present")),
                   
-                  cT = factor(cT,labels=c("T1","T2","T3","T4")),
-                 
-                  cN = factor(cT,labels=c("N0","N1","N2","N3")),
+                  
           
                   Smoking_state = factor(Smoking_state,labels = c("unknown","current-smoker","ex- smoker",
                                                                   "non- smoker")),
@@ -499,8 +497,8 @@ exp(-0.003081)
 
 Difference in risk of death based on Operation undergone : 
 ```{r}
-summary(glm(death ~ OP, data = lungcancer_PC, family = "binomial"))
-summary(fit)
+summary(glm(death ~ OP, data = lungSCC, family = "binomial"))
+
 ```
 
 ```{r}
@@ -516,8 +514,8 @@ Interpretation :
 
 Difference in risk of death based on smoking state : 
 ```{r}
-summary(glm(death ~ Smoking_state, data = lungcancer_PC, family = "binomial"))
-summary(fit)
+summary(glm(death ~ Smoking_state, data = lungSCC, family = "binomial"))
+
 
 ```
 Interpretation : 
@@ -526,8 +524,8 @@ Interpretation :
 
 Difference in risk of death based on Central Lung SCC size of Tumor : 
 ```{r}
-summary(glm(death ~ cT, data = lungcancer_PC, family = "binomial"))
-summary(fit)
+summary(glm(death ~ cT, data = lungSCC, family = "binomial"))
+
 ```
 
 ```{r}
@@ -548,8 +546,8 @@ Interpretations:
 
 Difference in risk of death when Nearby lymph nodes that are involved : 
 ```{r}
-summary(glm(death ~ cN, data = lungcancer_PC, family = "binomial"))
-summary(fit)
+summary(glm(death ~ cN, data = lungSCC, family = "binomial"))
+
 ```
 
 
@@ -574,8 +572,8 @@ Interpretations:
 
 Difference in risk of death when Distant metastasis (spread of cancer from one part of the body to another) are involved : 
 ```{r}
-summary(glm(death ~ cM, data = lungcancer_PC, family = "binomial"))
-summary(fit)
+summary(glm(death ~ cM, data = lungSCC, family = "binomial"))
+
 
 ```
 
