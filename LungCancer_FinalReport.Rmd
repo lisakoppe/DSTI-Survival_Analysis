@@ -11,14 +11,9 @@ Paper:
 # Import the necessary packages:
 
 ```{r}
-
-# REMOVE UNUSED LIBRARIES AT THE END
-
 library(tidyverse)
 library(survival)
-library(ggplot2)
-library(dplyr)
-library(tidyr)
+library(survminer)
 ```
 
 # Data preparation: load the lung cancer dataset and check data types
@@ -363,8 +358,11 @@ X. Difference in risk of death based on CEA serum
 X. Difference in risk of death based on lymph node ratio:
 ```{r}
 with(lungSCC, table(death, LN_ratio))
+
 fit <- glm(death~LN_ratio, family="binomial", data=lungSCC)
 summary(fit)
+
+exp(confint(glm(death~LN_ratio, family="binomial", data=lungSCC))[2,])
 ```
 Interpretation:
 1. The coefficient is positive (1.38) which means that there is a positive association between the lymph node ratio and the risk of death.
@@ -375,6 +373,8 @@ Interpretation:
 # TRY TO SPLIT INTO RANGES
 fit <- glm(death~I(LN_ratio/4), family="binomial", data=lungSCC)
 summary(fit)
+
+exp(confint(glm(death~I(LN_ratio/4), family="binomial", data=lungSCC))[2,])
 ```
 
 ```{r}
@@ -386,8 +386,11 @@ Interpretation: odds ratio
 X. Difference in risk of death based on pT peripheral tumor size:
 ```{r}
 with(lungSCC, table(death, pT))
+
 fit <- glm(death~pT, family="binomial", data=lungSCC)
 summary(fit)
+
+exp(confint(glm(death~pT, family="binomial", data=lungSCC))[2,])
 ```
 Interpretation:
 1. pT3 tumor size shows significantly positive relationship with the risk of death with p-value 0.005.
@@ -406,8 +409,11 @@ Interpretation:
 X. Difference in risk of death based on pN peripheral tumor size:
 ```{r}
 with(lungSCC, table(death, pN))
+
 fit <- glm(death~pN, family="binomial", data=lungSCC)
 summary(fit)
+
+exp(confint(glm(death~pN, family="binomial", data=lungSCC))[2,])
 ```
 Interpretation:
 1. pN2 tumor size shows a highly significant positive relationship with the risk of death with p-value 0.0003.
@@ -426,8 +432,11 @@ Interpretation:
 X. Difference in risk of death based on pM peripheral tumor size:
 ```{r}
 with(lungSCC, table(death, pM))
+
 fit <- glm(death~pM, family="binomial", data=lungSCC)
 summary(fit)
+
+exp(confint(glm(death~pM, family="binomial", data=lungSCC))[2,])
 ```
 Interpretation:
 1. There is no relationship between the pM tumor size and the prediction of death status (p-value = 0.98).
@@ -440,8 +449,11 @@ exp(15.8626)
 X. Difference in risk of death based on FEV1_FVC pulmonary function test:
 ```{r}
 with(lungSCC, table(death, FEV1_FVC))
+
 fit <- glm(death~FEV1_FVC, family="binomial", data=lungSCC)
 summary(fit)
+
+exp(confint(glm(death~FEV1_FVC, family="binomial", data=lungSCC))[2,])
 ```
 Interpretation:
 1. There is no significant relationship between the pulmonary function test FEV1_FVC and the prediction of death status (p-value = 0.21).
@@ -455,8 +467,11 @@ exp(0.011147)
 X. Difference in risk of death based on CEA serum:
 ```{r}
 with(lungSCC, table(death, CEA))
+
 fit <- glm(death~CEA, family="binomial", data=lungSCC)
 summary(fit)
+
+exp(confint(glm(death~CEA, family="binomial", data=lungSCC))[2,])
 ```
 Interpretation:
 1. There is no significant relationship between the CEA serum and the prediction of death status (p-value = 0.58).
