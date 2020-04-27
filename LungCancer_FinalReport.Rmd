@@ -592,7 +592,22 @@ Interpretation
 
 
 # Part 3: Kaplan-Meyer estimator with features which have a significant relationship with survival time (OS)
+(Only when n of each gr kind of similar)
 
+## Comparison between 2 groups of patients based on observed metastasis after surgery
 
+```{r}
+fit.KM_meta <- survfit(Surv(OS, death)~meta, data=lungSCC)
+fit.KM_meta
+```
+Interpretation
 
-
+```{r}
+ggsurvplot(fit.KM_meta,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Observation of metastasis",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
