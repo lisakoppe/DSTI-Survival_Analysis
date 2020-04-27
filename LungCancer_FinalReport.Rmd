@@ -157,8 +157,10 @@ lungSCC <- mutate(lungSCC_raw,
 1. Location
    = tumor location
    (Class: 0=Peripheral SCC, 1=Central SCC)
+   
 2. death
    (Logical: 0=Alive, 1=Dead)
+   
 3. OS
    = Overall Survival in months: interval between the date of diagnosis and date of death (by any cause)
 
@@ -167,48 +169,67 @@ lungSCC <- mutate(lungSCC_raw,
 4. Obst_pn_or_plugging
    = presence of obstructive pneumonitis/atelectais
    (Logical: 0=Absent, 1=Present)
+   
 5. Necrosis
    (Class: 0=Nothing, 1=Necrosis, 2=Cavitization)
+   
 6. Underlying_lung
    = Underlying lung disease
    (Class: 0=No Remarkable, 1=Emphysema, 2=Interstitial lung abnormality)
+   
 7. Effusion
    (Logical: 0=Absent, 1=Present)
 
-## Clinicopathologic features: TO BE COMPLETED
+## Clinicopathologic features: 
 
 8. Sex
-   =
+   = Gender of the patient
+   (Class: F=Female, M=Male)
+   
 9. Age
-   =
+   = Age of the person 
+   
 10. LN_ratio
     = lymph node ratio: number of nodes with positive tumor cells divided by the number of all resected nodes
+    
 11. cT
     = central / size of original tumor
     (Class: 1=T1, 2=T2, 3=T3, 4=T4)
+    
 12. cN
     = central / nearby lymph nodes involved
     (Class: 1=N0, 2=N1, 3=N2, 4=N3)
+    
 13. cM
     = central / distant metastasis (spread of cancer from one part of the body to another)
     (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
+    
 14. pT
     = peripheral / size of original tumor
     (Class: 1=T1, 2=T2, 3=T3, 4=T4)
+    
 15. pN
     = peripheral / nearby lymph nodes involved
     (Class: 1=N0, 2=N1, 3=N2, 4=N3)
+    
 16. pM
     = peripheral / distant metastasis (spread of cancer from one part of the body to another)
     (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
+    
 17. Smoking_state
-    =
+    = Current smoking state of the patient
+    (Class: 0=Unknown, 1=Current, 2=Ex, 3=Non)
+    
 18. FEV1_FVC
     = pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
+    
 19. CEA
     = serum carcinoembryonic antigen level in ng/ml (tumor marker)
+    
 20. op_type
-    =
+    = type of operation the person has undergone
+    (Class: 1=Lobectomy, 2=Pneumonectomy, 3=Segmentectomy, 4=LN biopsy, 5=No Op)
+    
 21. meta
     = metastasis observed
     (Logical: 0=Absent, 1=Present)
