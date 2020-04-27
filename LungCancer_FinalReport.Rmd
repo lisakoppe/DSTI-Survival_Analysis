@@ -23,7 +23,7 @@ library(survminer)
 
 lungSCC_raw <- read_csv("LungCancer.csv",
                          col_types=cols(Sex='c',
-                                       Age='d',
+                                       Age='c',
                                        Location='d',
                                        Obst_pn_or_plugging='d',
                                        Necrosis='d',
