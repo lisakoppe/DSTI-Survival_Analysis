@@ -115,9 +115,7 @@ lungSCC <- mutate(lungSCC_raw,
                   AG=factor(AG),
                 
                   OP=factor(op_type, labels=c("lobectomy", "pneumonectomy", "segmentectomy", "LN biopsy", "No OP")),
-                 
-                  Multiplicity=factor(Multiplicity, labels=c("absent", "present")),
-                  
+                                                  
                   Smoking_state=factor(Smoking_state, labels=c("unknown", "current-smoker", "ex- smoker", "non- smoker")),
                   
                   cT=factor(cT, levels=c("1", "2", "3", "4"), labels=c("cT1", "cT2", "cT3", "cT4")),
