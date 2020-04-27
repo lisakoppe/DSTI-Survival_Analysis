@@ -173,8 +173,9 @@ table(lungSCC$AG)
    = gender of the patient
    (Class: F=Female, M=Male)
    
-9. Age
-   = age of the person 
+9. AG
+   = age at diagnosis
+   (Class: LT60 = Lower than 60 years old, OV60 = Over than 60 years old)
    
 10. LN_ratio
     = lymph node ratio: number of nodes with positive tumor cells divided by the number of all resected nodes
@@ -205,7 +206,7 @@ table(lungSCC$AG)
     
 17. Smoking_state
     = current smoking state of the patient
-    (Class: 0=Unknown, 1=Current, 2=Ex, 3=Non)
+    (Class: current-smoker, ex-smoker, non-smoker, unknown)
     
 18. FEV1_FVC
     = pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
@@ -213,9 +214,9 @@ table(lungSCC$AG)
 19. CEA
     = serum carcinoembryonic antigen level in ng/ml (tumor marker)
     
-20. op_type
+20. OP
     = type of operation the person has undergone
-    (Class: 1=Lobectomy, 2=Pneumonectomy, 3=Segmentectomy, 4=LN biopsy, 5=No Op)
+    (Class: lobectomy, pneumonectomy, segmentectomy, LN biopsy, no Op)
     
 21. meta
     = metastasis observed
