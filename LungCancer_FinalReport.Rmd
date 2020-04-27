@@ -39,7 +39,7 @@ lungSCC_raw <- read_csv("LungCancer.csv",
                                        Smoking_state='c',  
                                        FEV1_FVC='d',
                                        CEA='d',
-                                       op_type='d',
+                                       op_type='c',
                                        death='d',
                                        OP_site_recur='l',
                                        meta='l',
@@ -132,6 +132,14 @@ lungSCC <- mutate(lungSCC_raw,
                   
                   pM=factor(pM, levels=c("1", "3"), labels=c("pM0", "pM1b")))
 ```
+
+Recheck the distribution of age after regrouped
+```{r}
+table(lungSCC$AG)
+```
+
+
+
 
 # Features description
 
