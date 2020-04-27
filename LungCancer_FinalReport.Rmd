@@ -19,9 +19,6 @@ library(survminer)
 # Data preparation: load the lung cancer dataset and check data types
 
 ```{r}
-
-# CAREFUL: NEED TO REVIEW DATA TYPES (ESPECIALLY LOGICAL)
-
 lungSCC_raw <- read_csv("LungCancer.csv",
                         col_types=cols(Index='c',
                                        Sex='c',
@@ -113,9 +110,6 @@ table(lungSCC_raw$meta, useNA="always")
 Define the meaning of each label to make it easier for interpretation
 
 ```{r}
-
-# TO BE COMPLETED
-
 lungSCC <- mutate(lungSCC_raw,
                   Location=ifelse(Location==0, "Peripheral","Central"),
                   
@@ -124,32 +118,30 @@ lungSCC <- mutate(lungSCC_raw,
 
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
                                          ifelse(Underlying_lung==1, "Emphysema", "ILA")),
-                  Sex = factor(Sex, levels = c("F", "M")),
                   
-                  AG = ifelse((Age < 60), "LT60", "OV60"),
+                  Sex=factor(Sex, levels=c("F", "M")),
+                  
+                  AG=ifelse((Age<60), "LT60", "OV60"),
           
-                  AG = factor(AG),
+                  AG=factor(AG),
                 
-                  OP = factor(op_type,labels = c("lobectomy","pneumonectomy","segmentectomy","LN biopsy","No OP")),
+                  OP=factor(op_type, labels=c("lobectomy", "pneumonectomy", "segmentectomy", "LN biopsy", "No OP")),
                  
-                  Multiplicity = factor(Multiplicity,labels=c("absent","present")),
+                  Multiplicity=factor(Multiplicity, labels=c("absent", "present")),
                   
+                  Smoking_state=factor(Smoking_state, labels=c("unknown", "current-smoker", "ex- smoker", "non- smoker")),
                   
-          
-                  Smoking_state = factor(Smoking_state,labels = c("unknown","current-smoker","ex- smoker",
-                                                                  "non- smoker")),
+                  cT=factor(cT, levels=c("1", "2", "3", "4"), labels=c("cT1", "cT2", "cT3", "cT4")),
                   
-                  cT = factor(cT, levels = c("1", "2", "3", "4"), labels = c("cT1", "cT2", "cT3", "cT4")),
+                  cN=factor(cN, levels=c("1", "2", "3", "4"), labels=c("cN0", "cN1", "cN2", "cN3")),
                   
-                  cN = factor(cN, levels = c("1", "2", "3", "4"), labels = c("cN0", "cN1", "cN2", "cN3")),
+                  cM=factor(cM, levels=c("1", "3"), labels=c("cM0", "cM1b")),
                   
-                  cM = factor(cM, levels = c("1", "3"), labels = c("cM0", "cM1b")),
+                  pT=factor(pT, levels=c("1", "2", "3", "4"), labels=c("pT1", "pT2", "pT3", "pT4")),
                   
-                  pT = factor(pT, levels = c("1", "2", "3", "4"), labels = c("pT1", "pT2", "pT3", "pT4")),
+                  pN=factor(pN, levels=c("1", "2", "3", "4"), labels=c("pN0", "pN1", "pN2", "pN3")),
                   
-                  pN = factor(pN, levels = c("1", "2", "3", "4"), labels = c("pN0", "pN1", "pN2", "pN3")),
-                  
-                  pM = factor(pM, levels = c("1", "3"), labels = c("pM0", "pM1b")))
+                  pM=factor(pM, levels=c("1", "3"), labels=c("pM0", "pM1b")))
 ```
 
 # Features description
@@ -174,7 +166,7 @@ lungSCC <- mutate(lungSCC_raw,
    (Class: 0=Nothing, 1=Necrosis, 2=Cavitization)
    
 6. Underlying_lung
-   = Underlying lung disease
+   = underlying lung disease
    (Class: 0=No Remarkable, 1=Emphysema, 2=Interstitial lung abnormality)
    
 7. Effusion
@@ -183,11 +175,11 @@ lungSCC <- mutate(lungSCC_raw,
 ## Clinicopathologic features: 
 
 8. Sex
-   = Gender of the patient
+   = gender of the patient
    (Class: F=Female, M=Male)
    
 9. Age
-   = Age of the person 
+   = age of the person 
    
 10. LN_ratio
     = lymph node ratio: number of nodes with positive tumor cells divided by the number of all resected nodes
@@ -217,7 +209,7 @@ lungSCC <- mutate(lungSCC_raw,
     (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
     
 17. Smoking_state
-    = Current smoking state of the patient
+    = current smoking state of the patient
     (Class: 0=Unknown, 1=Current, 2=Ex, 3=Non)
     
 18. FEV1_FVC
@@ -571,7 +563,7 @@ exp(1.4731)
 exp(1.3122)
 ```
 Interpretations: 
-1.All the tumor size have positive association with the risk of death
+1. All the tumor size have positive association with the risk of death
 2. Tumor size T2 has 76% more chances of death as compaed to T1
 3. Tumor size T3 has 336% more chances of death as compaed to T1
 4. Tumor size T4 has 271% more chances of death as compaed to T1
@@ -622,7 +614,7 @@ Interpretations:
 
 # Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)
 
-Methods used: Univariate Cox regression
+Methods used: Cox Proportional Hazards Model
 
 ## Relationship between radiologic features and survival time (OS)
 
