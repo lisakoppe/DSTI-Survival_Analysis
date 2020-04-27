@@ -216,7 +216,7 @@ lungSCC <- mutate(lungSCC_raw,
     (Logical: 0=Absent, 1=Present)
 
 
-# Part 1: Test relationship between radiologic/clinicopathologic features and death (not considering survival duration)
+*# Part 1: Test relationship between radiologic/clinicopathologic features and death (not considering survival duration)*
 
 Methods used:
 1. Fisher's exact test (determine the relationship between two categorical variables)
@@ -601,7 +601,7 @@ Interpretations:
 2.M3 Distant metastasis  has 31 % higher chances of risk of death as compared to M1 
 
 
-# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)
+*# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
 
 Methods used: Cox Proportional Hazards Model
 
@@ -610,9 +610,8 @@ Methods used: Cox Proportional Hazards Model
 ----
 1. patient with and without obstructive pneumonitis/ atelectais
 2. patient with and without lung effusion
-3. cancer location
-4. cell necrosis
-5. underlying lung disease
+3. cell necrosis
+4. underlying lung disease
 ----
 
 1. patient with and without obstructive pneumonitis/ atelectais
@@ -626,26 +625,23 @@ Interpretation
 fit_effusion <- coxph(Surv(OS, death)~Effusion, data=lungSCC)
 summary(fit_effusion)
 ```
-Interpretation
+Interpretation:
+With a p-value close to 1 (0.92) we can assume that there is no significant relationship between survival time and lung effusion.
 
-3. cancer location
+3. cell necrosis
 ```{r}
 
 ```
 Interpretation
 
-4. cell necrosis
-```{r}
-
-```
-Interpretation
-
-5. underlying lung disease
+4. underlying lung disease
 ```{r}
 fit_UndLung <- coxph(Surv(OS, death)~Underlying_lung, data=lungSCC)
 summary(fit_UndLung)
 ```
-Interpretation
+Interpretation:
+1. With a very low p-value of 1.95e-05 and a positive coefficient of 1.21, we can assume that there is a highly significant positive relationship between survival time and Interstitial lung abnormalities (ILA).
+2. No underlying lung disease has a statistically significant negative relationship with the survival time with a p-value of 0.02.
 
 
 ## Relationship between clinicopathologic features and survival time (OS)
@@ -665,52 +661,59 @@ X. patient with and without observed metastasis after surgery (meta)
 fit_meta <- coxph(Surv(OS, death)~meta, data=lungSCC)
 summary(fit_meta)
 ```
-Interpretation
+Interpretation:
+With a very low p-value of 5.22e-08 and a positive coefficient of 0.85, we can assume that there is a highly significant positive relationship between survival time and the observation of metastasis after surgery.
 
 X. lymph node ratio
 ```{r}
 fit_LNratio <- coxph(Surv(OS, death)~LN_ratio, data=lungSCC)
 summary(fit_LNratio)
 ```
-Interpretation
+Interpretation:
+With a positive coefficient of 0.84 and low p-value of 0.009, we can assume that there is a significant positive relationship between survival time and the lymph node ratio.
 
 X. pT peripheral tumor size
 ```{r}
 fit_pT <- coxph(Surv(OS, death)~pT, data=lungSCC)
 summary(fit_pT)
 ```
-Interpretation
+Interpretation:
+With a positive coefficient of 1.99 and low p-value of 0.008, we can assume that there is a significant positive relationship between survival time and the pT3 tumor size.
 
 X. pN peripheral tumor size
 ```{r}
 fit_pN <- coxph(Surv(OS, death)~pN, data=lungSCC)
 summary(fit_pN)
 ```
-Interpretation
+Interpretation:
+With a positive coefficient of 0.86 and very low p-value of 1.51e-05, we can assume that there is a highly significant positive relationship between survival time and the pN2 tumor size.
 
 X. pM peripheral tumor size
 ```{r}
 fit_pM <- coxph(Surv(OS, death)~pM, data=lungSCC)
 summary(fit_pM)
 ```
-Interpretation
+Interpretation: #CAREFUL WITH THIS ONE
+With a positive coefficient of 1.77 and very low p-value of 0.0005, we can assume that there is a highly significant positive relationship between survival time and the pM1b tumor size.
 
 X. FEV1_FVC pulmonary function test
 ```{r}
 fit_FEV1FVC <- coxph(Surv(OS, death)~FEV1_FVC, data=lungSCC)
 summary(fit_FEV1FVC)
 ```
-Interpretation
+Interpretation:
+With a p-value of 0.13 we can assume that there is no significant relationship between survival time and the FEV1_FVC pulmonary function test.
 
 X. CEA serum
 ```{r}
 fit_CEA <- coxph(Surv(OS, death)~CEA, data=lungSCC)
 summary(fit_CEA)
 ```
-Interpretation
+Interpretation:
+With a p-value of 0.60 we can assume that there is no significant relationship between survival time and the CEA serum.
 
 
-# Part 3: Kaplan-Meyer estimator with features which have a significant relationship with survival time (OS)
+*# Part 3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
 (Only when n of each gr kind of similar)
 
 ## Comparison between 2 groups of patients based on observed metastasis after surgery
@@ -721,6 +724,8 @@ fit.KM_meta
 ```
 Interpretation
 
+
+We plot the Kaplan-Meier survival curve:
 ```{r}
 ggsurvplot(fit.KM_meta,
            legend = "bottom",
