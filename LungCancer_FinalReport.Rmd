@@ -366,7 +366,7 @@ exp(confint(glm(death~LN_ratio, family="binomial", data=lungSCC))[2,])
 ```
 Interpretation:
 1. The coefficient is positive (1.38) which means that there is a positive association between the lymph node ratio and the risk of death.
-2. p-value (0.02) remains small so this relationship is slightly significant. #ADD CI
+2. p-value (0.02) remains small so this relationship is slightly significant.
 3. Odds ratio doen't give any information here because of the continuous type of this variable.
 
 ```{r}
@@ -482,12 +482,111 @@ exp(-0.003081)
 ```
 
 
+# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)
+
+Methods used: Univariate Cox regression
+
+## Relationship between radiologic features and survival time (OS)
+
+----
+1. patient with and without obstructive pneumonitis/ atelectais
+2. patient with and without lung effusion
+3. cancer location
+4. cell necrosis
+5. underlying lung disease
+----
+
+1. patient with and without obstructive pneumonitis/ atelectais
+```{r}
+
+```
+Interpretation
+
+2. patient with and without lung effusion
+```{r}
+fit_effusion <- coxph(Surv(OS, death)~Effusion, data=lungSCC)
+summary(fit_effusion)
+```
+Interpretation
+
+3. cancer location
+```{r}
+
+```
+Interpretation
+
+4. cell necrosis
+```{r}
+
+```
+Interpretation
+
+5. underlying lung disease
+```{r}
+fit_UndLung <- coxph(Surv(OS, death)~Underlying_lung, data=lungSCC)
+summary(fit_UndLung)
+```
+Interpretation
 
 
-# Part 2: Test relationship between radiologic/clinicopathologic features and survival time
+## Relationship between clinicopathologic features and survival time (OS)
 
-Methods used:
+----
+X. patient with and without observed metastasis after surgery (meta)
+X. lymph node ratio
+X. pT peripheral tumor size
+X. pN peripheral tumor size
+X. pM peripheral tumor size
+X. FEV1_FVC pulmonary function test
+X. CEA serum
+----
 
-## Relationship between radiologic features and survival time
+X. patient with and without observed metastasis after surgery (meta)
+```{r}
+fit_meta <- coxph(Surv(OS, death)~meta, data=lungSCC)
+summary(fit_meta)
+```
+Interpretation
 
-## Relationship between clinicopathologic features and survival time
+X. lymph node ratio
+```{r}
+fit_LNratio <- coxph(Surv(OS, death)~LN_ratio, data=lungSCC)
+summary(fit_LNratio)
+```
+Interpretation
+
+X. pT peripheral tumor size
+```{r}
+fit_pT <- coxph(Surv(OS, death)~pT, data=lungSCC)
+summary(fit_pT)
+```
+Interpretation
+
+X. pN peripheral tumor size
+```{r}
+fit_pN <- coxph(Surv(OS, death)~pN, data=lungSCC)
+summary(fit_pN)
+```
+Interpretation
+
+X. pM peripheral tumor size
+```{r}
+fit_pM <- coxph(Surv(OS, death)~pM, data=lungSCC)
+summary(fit_pM)
+```
+Interpretation
+
+X. FEV1_FVC pulmonary function test
+```{r}
+fit_FEV1FVC <- coxph(Surv(OS, death)~FEV1_FVC, data=lungSCC)
+summary(fit_FEV1FVC)
+```
+Interpretation
+
+X. CEA serum
+```{r}
+fit_CEA <- coxph(Surv(OS, death)~CEA, data=lungSCC)
+summary(fit_CEA)
+```
+Interpretation
+
