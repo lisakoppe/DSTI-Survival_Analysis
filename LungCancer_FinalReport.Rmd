@@ -124,6 +124,20 @@ lungSCC <- mutate(lungSCC_raw,
 
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
                                          ifelse(Underlying_lung==1, "Emphysema", "ILA")),
+                  Sex = factor(Sex, levels = c("F", "M")),
+                  
+                  AG = ifelse((Age < 60), "LT60", "OV60"),
+          
+                  AG = factor(AG),
+                
+                  OP = factor(op_type,labels = c("lobectomy","pneumonectomy","segmentectomy","LN biopsy","No OP")),
+                 
+                  Multiplicity = factor(Multiplicity,labels=c("absent","present")),
+                  
+                  
+          
+                  Smoking_state = factor(Smoking_state,labels = c("unknown","current-smoker","ex- smoker",
+                                                                  "non- smoker")),
                   
                   cT = factor(cT, levels = c("1", "2", "3", "4"), labels = c("cT1", "cT2", "cT3", "cT4")),
                   
@@ -143,8 +157,10 @@ lungSCC <- mutate(lungSCC_raw,
 1. Location
    = tumor location
    (Class: 0=Peripheral SCC, 1=Central SCC)
+   
 2. death
    (Logical: 0=Alive, 1=Dead)
+   
 3. OS
    = Overall Survival in months: interval between the date of diagnosis and date of death (by any cause)
 
@@ -153,48 +169,67 @@ lungSCC <- mutate(lungSCC_raw,
 4. Obst_pn_or_plugging
    = presence of obstructive pneumonitis/atelectais
    (Logical: 0=Absent, 1=Present)
+   
 5. Necrosis
    (Class: 0=Nothing, 1=Necrosis, 2=Cavitization)
+   
 6. Underlying_lung
    = Underlying lung disease
    (Class: 0=No Remarkable, 1=Emphysema, 2=Interstitial lung abnormality)
+   
 7. Effusion
    (Logical: 0=Absent, 1=Present)
 
-## Clinicopathologic features: TO BE COMPLETED
+## Clinicopathologic features: 
 
 8. Sex
-   =
+   = Gender of the patient
+   (Class: F=Female, M=Male)
+   
 9. Age
-   =
+   = Age of the person 
+   
 10. LN_ratio
     = lymph node ratio: number of nodes with positive tumor cells divided by the number of all resected nodes
+    
 11. cT
     = central / size of original tumor
     (Class: 1=T1, 2=T2, 3=T3, 4=T4)
+    
 12. cN
     = central / nearby lymph nodes involved
     (Class: 1=N0, 2=N1, 3=N2, 4=N3)
+    
 13. cM
     = central / distant metastasis (spread of cancer from one part of the body to another)
     (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
+    
 14. pT
     = peripheral / size of original tumor
     (Class: 1=T1, 2=T2, 3=T3, 4=T4)
+    
 15. pN
     = peripheral / nearby lymph nodes involved
     (Class: 1=N0, 2=N1, 3=N2, 4=N3)
+    
 16. pM
     = peripheral / distant metastasis (spread of cancer from one part of the body to another)
     (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
+    
 17. Smoking_state
-    =
+    = Current smoking state of the patient
+    (Class: 0=Unknown, 1=Current, 2=Ex, 3=Non)
+    
 18. FEV1_FVC
     = pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
+    
 19. CEA
     = serum carcinoembryonic antigen level in ng/ml (tumor marker)
+    
 20. op_type
-    =
+    = type of operation the person has undergone
+    (Class: 1=Lobectomy, 2=Pneumonectomy, 3=Segmentectomy, 4=LN biopsy, 5=No Op)
+    
 21. meta
     = metastasis observed
     (Logical: 0=Absent, 1=Present)
@@ -246,6 +281,20 @@ Interpretation:
 No relationship between death and lung effusion (p-value = 1)
 Patients with lung effusion have 5% higher risk of death than patients without lung effusion
 
+3. Difference in risk of death in patient with Age less than and over 60:
+```{r}
+with(lungSCC, fisher.test(table(death, AG)))
+```
+Interpretation:
+With p-value = 0.002378 less than the significance level, we can reject null hypothsis and can conclue that person with age more than 60 years have 4 times higher chances of dying than the younger people
+
+4. Difference in risk of death in patient based on gender
+```{r}
+with(lungSCC, fisher.test(table(death, Sex)))
+
+```
+Interpretation:
+As the p-value is 0.5974 , we can conclude that chances of death is independent of gender 
 
 ### Logistic regression
 
@@ -480,6 +529,95 @@ Interpretation:
 ```{r}
 exp(-0.003081)
 ```
+
+Difference in risk of death based on Operation undergone : 
+```{r}
+summary(glm(death ~ OP, data = lungSCC, family = "binomial"))
+
+```
+
+```{r}
+exp(2.0974)
+
+```
+Interpretation :
+1.We can see that No operation ,pneumonectomy and PLN biopsy has postive effect on death while segmentectomy has negative effect 
+2.LN biopsy has significant relation with the prediction of death with p-value : 0.006946
+3. The odds ratio states that person who has undergone  LN biopsyhas 714% chances of death as compared to person undergone lobectomy 
+
+
+
+Difference in risk of death based on smoking state : 
+```{r}
+summary(glm(death ~ Smoking_state, data = lungSCC, family = "binomial"))
+
+
+```
+Interpretation : 
+1.Being a current smoker , ex smoker and non smoker has negative association with death .
+2.No significant relation between Smoking State and death
+
+Difference in risk of death based on Central Lung SCC size of Tumor : 
+```{r}
+summary(glm(death ~ cT, data = lungSCC, family = "binomial"))
+
+```
+
+```{r}
+exp(0.5702)
+
+exp(1.4731)
+
+exp(1.3122)
+```
+Interpretations: 
+1.All the tumor size have positive association with the risk of death
+2. Tumor size T2 has 76% more chances of death as compaed to T1
+3. Tumor size T3 has 336% more chances of death as compaed to T1
+4. Tumor size T4 has 271% more chances of death as compaed to T1
+5. Patient with Central SSC tumor size of T3 has the highest risk of death 
+
+
+
+Difference in risk of death when Nearby lymph nodes that are involved : 
+```{r}
+summary(glm(death ~ cN, data = lungSCC, family = "binomial"))
+
+```
+
+
+```{r}
+exp(0.5702)
+
+exp(1.4731)
+
+exp(1.3122)
+
+```
+
+
+Interpretations: 
+1.All the tumor size have positive association with the risk of death
+2. Proximity of N1 lymph nodes has 76% more chances of death as compared to N0
+3. Proximity of N2 lymph nodes has 336% more chances of death as compared to N0
+4. Proximity of N3 lymph nodes has 271% more chances of death as compared to N0
+5. Patient with Proximity of N2 lymph nodes has the highest risk of death 
+
+
+
+Difference in risk of death when Distant metastasis (spread of cancer from one part of the body to another) are involved : 
+```{r}
+summary(glm(death ~ cM, data = lungSCC, family = "binomial"))
+
+
+```
+
+```{r}
+exp(0.2744)
+```
+Interpretations:
+1.All Distant metastasis  have positive association with the risk of death
+2.M3 Distant metastasis  has 31 % higher chances of risk of death as compared to M1 
 
 
 # Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)
