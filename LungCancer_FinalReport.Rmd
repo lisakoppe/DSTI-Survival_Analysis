@@ -19,13 +19,8 @@ library(survminer)
 # Data preparation: load the lung cancer dataset and check data types
 
 ```{r}
-<<<<<<< HEAD
-=======
-
-# CAREFUL: NEED TO REVIEW DATA TYPES (ESPECIALLY LOGICAL)
-
 # Note: Check only data type of columns that we want to work with since we have set the default for the remaining as c already
->>>>>>> de0e8616c6a028d8fa1acc6a4ca4581fadf08180
+
 lungSCC_raw <- read_csv("LungCancer.csv",
                          col_types=cols(Sex='c',
                                        Age='d',
