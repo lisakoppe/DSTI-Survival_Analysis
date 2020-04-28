@@ -1057,6 +1057,113 @@ survdiff(Surv(OS, death)~pM, data=lungSCC)
 Interpretation:
 
 
+## Comparison between 2 groups of patients based on underlying lung disease
+
+```{r}
+fit.KM_under <- survfit(Surv(OS, death)~Underlying_lung, data=lungSCC)
+fit.KM_under
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_under,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Underlying lung disease",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~Underlying_lung, data=lungSCC)
+```
+Interpretation:
+
+
+## Comparison between 2 groups of patients based on Peripheral Lung SCC size of Tumor
+
+```{r}
+fit.KM_pT <- survfit(Surv(OS, death)~pT, data=lungSCC)
+fit.KM_pT
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pT,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Peripheral Lung SCC size of Tumor",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pT, data=lungSCC)
+```
+Interpretation:
+
+
+## Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved
+
+```{r}
+fit.KM_pN <- survfit(Surv(OS, death)~pN, data=lungSCC)
+fit.KM_pN
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pN,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "pN when nearby lymph nodes are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pN, data=lungSCC)
+```
+Interpretation:
+
+
+## Comparison between 2 groups of patients based on pM when distant metastasis are involved
+
+```{r}
+fit.KM_pM <- survfit(Surv(OS, death)~pM, data=lungSCC)
+fit.KM_pM
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pM,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "pM when distant metastasis are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pM, data=lungSCC)
+```
+Interpretation:
+
+
 ## Comparison between 2 groups of patients based on observed metastasis after surgery
 
 ```{r}
@@ -1078,12 +1185,22 @@ ggsurvplot(fit.KM_meta,
 ```
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Comparision between 2 groups of patients based on Necrosis
 
 ```{r}
 fit.KM_Age <- survfit(Surv(OS, death)~AG, data=lungSCC)
 fit.KM_Age
 ```
+=======
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~meta, data=lungSCC)
+```
+Interpretation:
+
+
+>>>>>>> 770dccbc5173bfbeed1ff9568a171f29e55bcbdf
 
 We plot the Kaplan-Meier survival curve:
 ```{r}
