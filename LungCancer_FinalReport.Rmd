@@ -661,9 +661,11 @@ Methods used: Cox Proportional Hazards Model
 
 1. patient with and without obstructive pneumonitis/ atelectais:
 ```{r}
-
+fit_Obst_pn_or_plugging <- coxph(Surv(OS, death)~Obst_pn_or_plugging, data=lungSCC)
+summary(fit_Obst_pn_or_plugging)
 ```
-Interpretation
+Interpretation:
+As the p-value is 0.099 , we can conclude that Obstructive pneumonitis/ atelectasis has no significant impact on the survival time .
 
 2. patient with and without lung effusion:
 ```{r}
@@ -692,9 +694,13 @@ However, with a p-value close to 1 (0.9) we can assume that there is no signific
 
 3. cell necrosis:
 ```{r}
+fit_necrosis <- coxph(Surv(OS, death)~Necrosis, data=lungSCC)
+summary(fit_necrosis)
 
 ```
-Interpretation
+Interpretation:
+With a negative coef -0.5734 and p-value as low as 0.033 we can assume that there is a significant negative relationship between survival time and the no remark in necrosis.
+
 
 4. underlying lung disease:
 ```{r}
