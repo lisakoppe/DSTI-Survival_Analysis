@@ -19,7 +19,9 @@ library(survminer)
 # Data preparation: load the lung cancer dataset and check data types
 
 ```{r}
-# Note: Check only data type of columns that we want to work with since we have set the default for the remaining as c already
+
+# Check data types only columns we want to work with
+# Set default as c for the rest
 
 lungSCC_raw <- read_csv("LungCancer.csv",
                          col_types=cols(Sex='c',
@@ -46,33 +48,17 @@ lungSCC_raw <- read_csv("LungCancer.csv",
                                        .default = 'c'))
 ```
 
-Explore the dataset
-# Note: Be careful about the interpretation of this chunk
-since some features are divided in class by number 
-For example, Necrosis is divided into 3 classes; normal = 0, necrosis =  1, cavitization = 2
-If we run this chunk we will get, mean of necrosis = 0.4171 >> Not the real data distribution of necrosis
-Therefore, the summary is useful for columns with the real numerical data only (age for example)
-
-To observe the distribution of features that use number to classify their classes, use command "table" as indicated in the next chunck of code
+# Explore the dataset:
+    - For classification data, use "table"
+    - For numerical data: use "table" + "summary"
+      (Summary to define basic descriptive statistic, Table to check null value)
 
 ```{r}
-names(lungSCC_raw)
-str(lungSCC_raw)
-dim(lungSCC_raw)
-head(lungSCC_raw)
-summary(lungSCC_raw)
-```
-
-Check null value and data classification for all 20 variables.
-Use table for classification and Logical column to see how they distribute.
-Count null value in decimal column (OS)
-
-```{r}
-table(lungSCC_raw$Location, useNA="always")
-table(lungSCC_raw$death, useNA="always")
+dim(lungSCC_raw)  # Check total patients + columns
 
 
 # Radiologic features
+table(lungSCC_raw$Location, useNA="always")
 table(lungSCC_raw$Obst_pn_or_plugging, useNA="always")
 table(lungSCC_raw$Necrosis, useNA="always")
 table(lungSCC_raw$Underlying_lung, useNA="always")
@@ -81,7 +67,9 @@ table(lungSCC_raw$Effusion, useNA="always")
 # Clinicopathologic features
 table(lungSCC_raw$Sex, useNA="always")
 table(lungSCC_raw$Age, useNA="always")
+summary(lungSCC_raw$Age)
 table(lungSCC_raw$LN_ratio, useNA="always")
+summary(lungSCC_raw$LN_ratio)
 table(lungSCC_raw$cT, useNA="always")
 table(lungSCC_raw$cN, useNA="always")
 table(lungSCC_raw$cM, useNA="always")
@@ -90,47 +78,54 @@ table(lungSCC_raw$pN, useNA="always")
 table(lungSCC_raw$pM, useNA="always")
 table(lungSCC_raw$Smoking_state, useNA="always")
 table(lungSCC_raw$FEV1_FVC, useNA="always")
-table(lungSCC_raw$CEA, useNA="always")
+summary(lungSCC_raw$FEV1_FVC)
+table(lungSCC_raw$CEA)
+summary(lungSCC_raw$CEA)
 table(lungSCC_raw$op_type, useNA="always")
+table(lungSCC_raw$death, useNA="always")
 table(lungSCC_raw$meta, useNA="always")
+table(lungSCC_raw$OS, useNA="always")
+summary(lungSCC_raw$OS)
 ```
 
-Define the meaning of each label to make it easier for interpretation
+
+Redefine the meaning of each label to make it easier for interpretation
+
 
 ```{r}
+
 lungSCC <- mutate(lungSCC_raw,
                   Location=ifelse(Location==0, "Peripheral","Central"),
-                  
+
                   Necrosis=ifelse(Necrosis==0, "NoRemark",
                                   ifelse(Necrosis==1, "Necrosis", "Cavitization")),
 
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
                                          ifelse(Underlying_lung==1, "Emphysema", "ILA")),
-                  
+
                   Effusion=factor(Effusion, levels=c("0", "1"), labels=c("Absent", "Present")),
-                  
-                  Sex=factor(Sex, levels=c("F", "M")),
-                  
+
                   AG=ifelse((Age<60), "LT60", "OV60"),
-          
-                  AG=factor(AG),
-                
-                  OP=factor(op_type, labels=c("lobectomy", "pneumonectomy", "segmentectomy", "LN biopsy", "No OP")),
-                                                  
-                  Smoking_state=factor(Smoking_state, labels=c("unknown", "current-smoker", "ex- smoker", "non- smoker")),
-                  
-                  cT=factor(cT, levels=c("1", "2", "3", "4"), labels=c("cT1", "cT2", "cT3", "cT4")),
-                  
-                  cN=factor(cN, levels=c("1", "2", "3", "4"), labels=c("cN0", "cN1", "cN2", "cN3")),
-                  
-                  cM=factor(cM, levels=c("1", "3"), labels=c("cM0", "cM1b")),
-                  
-                  pT=factor(pT, levels=c("1", "2", "3", "4"), labels=c("pT1", "pT2", "pT3", "pT4")),
-                  
-                  pN=factor(pN, levels=c("1", "2", "3", "4"), labels=c("pN0", "pN1", "pN2", "pN3")),
-                  
-                  pM=factor(pM, levels=c("1", "3"), labels=c("pM0", "pM1b")))
+
+                  AG = factor(AG),
+
+                  OP = factor(op_type,labels = c("lobectomy","pneumonectomy","segmentectomy","LN biopsy","No OP")),
+
+                  Smoking_state = factor(Smoking_state,labels = c("unknown","current-smoker","ex- smoker", "non- smoker")),
+
+                  cT = factor(cT, levels = c("1", "2", "3", "4"), labels = c("cT1", "cT2", "cT3", "cT4")),
+
+                  cN = factor(cN, levels = c("1", "2", "3", "4"), labels = c("cN0", "cN1", "cN2", "cN3")),
+
+                  cM = factor(cM, levels = c("1", "3"), labels = c("cM0", "cM1b")),
+
+                  pT = factor(pT, levels = c("1", "2", "3", "4"), labels = c("pT1", "pT2", "pT3", "pT4")),
+
+                  pN = factor(pN, levels = c("1", "2", "3", "4"), labels = c("pN0", "pN1", "pN2", "pN3")),
+
+                  pM = factor(pM, levels = c("1", "3"), labels = c("pM0", "pM1b")))
 ```
+
 
 Recheck the distribution of age after regrouped
 ```{r}
@@ -142,88 +137,88 @@ table(lungSCC$AG)
 # Features description
 
 1. Location
-   = tumor location
-   (Class: 0=Peripheral SCC, 1=Central SCC)
-   
+   = Tumor location
+   (0 = Peripheral SCC, 1 = Central SCC)
+
 2. death
-   (Logical: 0=Alive, 1=Dead)
-   
+   (0 = Alive, 1 = Dead)
+
 3. OS
    = Overall Survival in months: interval between the date of diagnosis and date of death (by any cause)
 
 ## Radiologic features:
 
 4. Obst_pn_or_plugging
-   = presence of obstructive pneumonitis/atelectais
-   (Logical: 0=Absent, 1=Present)
-   
-5. Necrosis
-   (Class: 0=Nothing, 1=Necrosis, 2=Cavitization)
-   
-6. Underlying_lung
-   = underlying lung disease
-   (Class: 0=No Remarkable, 1=Emphysema, 2=Interstitial lung abnormality)
-   
-7. Effusion
-   (Logical: 0=Absent, 1=Present)
+   = Presence of obstructive pneumonitis/atelectais
+   (0 = Absent, 1 = Present)
 
-## Clinicopathologic features: 
+5. Necrosis
+   (0 = No Remark, 1 = Necrosis, 2 = Cavitization)
+
+6. Underlying_lung
+   = Underlying lung disease
+   (0 = No Remark, 1 = Emphysema, 2 = Interstitial lung abnormality)
+
+7. Effusion
+   (0 = Absent, 1 = Present)
+
+## Clinicopathologic features:
 
 8. Sex
-   = gender of the patient
-   (Class: F=Female, M=Male)
-   
+   = Gender of the patient
+   (F=Female, M=Male)
+
 9. AG
-   = age at diagnosis
-   (Class: LT60 = Lower than 60 years old, OV60 = Over than 60 years old)
-   
+   = Age at diagnosis
+   (LT60 = Less than 60 years old, OV60 = Over 60 years old)
+
 10. LN_ratio
-    = lymph node ratio: number of nodes with positive tumor cells divided by the number of all resected nodes
-    
+    = Lymph node ratio: Number of nodes with positive tumor cells divided by the number of all resected nodes
+
 11. cT
-    = central / size of original tumor
-    (Class: 1=T1, 2=T2, 3=T3, 4=T4)
-    
+    = Size of original tumor in central lung SCC patients
+    (1 = T1, 2 = T2, 3 = T3, 4 = T4)
+
 12. cN
-    = central / nearby lymph nodes involved
-    (Class: 1=N0, 2=N1, 3=N2, 4=N3)
-    
+    = Nearby lymph nodes involved in central lung SCC patients
+    (1 = N0, 2 = N1, 3 = N2, 4 = N3)
+
 13. cM
-    = central / distant metastasis (spread of cancer from one part of the body to another)
-    (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
-    
+    = Distant metastasis (spread of cancer from one part of the body to another) in central lung SCC patients
+    (1 = M0, 2 = M1a, 3 = M1b, 4 = M1ab, 5 = Mx)
+
 14. pT
-    = peripheral / size of original tumor
-    (Class: 1=T1, 2=T2, 3=T3, 4=T4)
-    
+    = Size of original tumor in peripheral lung SCC patients
+    (1 = T1, 2 = T2, 3 = T3, 4 = T4)
+
 15. pN
-    = peripheral / nearby lymph nodes involved
-    (Class: 1=N0, 2=N1, 3=N2, 4=N3)
-    
+    = Nearby lymph nodes involved in peripheral lung SCC patients
+    (1 = N0, 2 = N1, 3 = N2, 4 = N3)
+
 16. pM
-    = peripheral / distant metastasis (spread of cancer from one part of the body to another)
-    (Class: 1=M0, 2=M1a, 3=M1b, 4=M1ab, 5=Mx)
-    
+    = Distant metastasis (spread of cancer from one part of the body to another) in peripheral lung SCC patients
+    (1 = M0, 2 = M1a, 3 = M1b, 4 = M1ab, 5 = Mx)
+
 17. Smoking_state
-    = current smoking state of the patient
-    (Class: current-smoker, ex-smoker, non-smoker, unknown)
-    
+    = Current smoking state of the patient
+    (current-smoker, ex-smoker, non-smoker, unknown)
+
 18. FEV1_FVC
-    = pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
-    
+    = Pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
+
 19. CEA
-    = serum carcinoembryonic antigen level in ng/ml (tumor marker)
-    
+    = Serum carcinoembryonic antigen level in ng/ml (tumor marker)
+
 20. OP
-    = type of operation the person has undergone
-    (Class: lobectomy, pneumonectomy, segmentectomy, LN biopsy, no Op)
-    
+    = Type of operation the person has undergone
+    (lobectomy, pneumonectomy, segmentectomy, LN biopsy, no Op)
+
 21. meta
-    = metastasis observed
-    (Logical: 0=Absent, 1=Present)
+    = Metastasis observed
+    (0=Absent, 1=Present)
 
 
-*# Part 1: Test relationship between radiologic/clinicopathologic features and death (not considering survival duration)*
+*Part 1: Test relationship between radiologic/clinicopathologic features and death*
 
 Methods used:
 1. Fisher's exact test (determine the relationship between two categorical variables)
@@ -289,9 +284,8 @@ summary(fit)
 ```
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The positive value of estimate coefficient indicates the positive relationship between peripheral lung cancer and risk of death.
-3. Odds of peripheral lung cancer is lower than odds of central lung cancer. 
-To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
+2. The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer. To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
+
 
 ```{r}
 exp(0.2749)
@@ -300,21 +294,35 @@ Interpretation:
 Risk of death of patients who have peripheral lung cancer is around 30% higher than patients with central lung cancer
 
 
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Location, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+Difference in risk of death between 2 type of lung cancer shows huge 95% interval starts from where patients with peripheral lung cancer have around 10% lower to two times higher risk of death than that of central lung cancer patients.
+
+
+
 2. Difference in risk of death based on cell necrosis:
 ```{r}
 fit <- glm(death~Necrosis, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. No cell necrosis observation shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
+1. No remakable cell necrosis shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
 2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
+
+BE CAREFUL!
+Have to check if + and - sign in front of estimate is the higher/lower odds when compare to reference class only (Interpretation 2 is kind of sure but better to be rechecked)
+Or we can say that it also shows + and - relaitonship with death as we mention in Interpretation 1
+
 
 ```{r}
 exp(-0.7482)
 exp(-0.9776)
 ```
 Interpretation:
-Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  63% lower than patients with cavitization.
+Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  62% lower than patients with cavitization.
 
 
 3. Difference in risk of death based on underlying lung disease:
@@ -325,7 +333,7 @@ summary(fit)
 Interpretation:
 1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.007.
 2. No underlying lung disease has statistically significant negative relationship with the risk of death with p-value 0.09
-2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema. 
+2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema.
 
 ```{r}
 exp(1.81475)
@@ -362,7 +370,7 @@ If those 2 sets of patient have equal odds (odds ratio = 1), that specific condi
 with(lungSCC, fisher.test(table(death, Sex)))
 ```
 Interpretation:
-As the p-value is 0.5974 , we can conclude that chances of death is independent of gender 
+As the p-value is 0.5974 , we can conclude that chances of death is independent of gender
 
 
 2. Difference in risk of death in patient with Age less than and over 60:
@@ -424,7 +432,7 @@ exp(1.38)
 Interpretation: odds ratio
 
 
-2. Difference in risk of death based on cT Central Lung SCC size of Tumor: 
+2. Difference in risk of death based on cT Central Lung SCC size of Tumor:
 ```{r}
 summary(glm(death ~ cT, data = lungSCC, family = "binomial"))
 ```
@@ -434,12 +442,12 @@ exp(0.5702)
 exp(1.4731)
 exp(1.3122)
 ```
-Interpretations: 
+Interpretations:
 1. All the tumor size have positive association with the risk of death
 2. Tumor size T2 has 76% more chances of death as compaed to T1
 3. Tumor size T3 has 336% more chances of death as compaed to T1
 4. Tumor size T4 has 271% more chances of death as compaed to T1
-5. Patient with Central SSC tumor size of T3 has the highest risk of death 
+5. Patient with Central SSC tumor size of T3 has the highest risk of death
 
 
 3. Difference in risk of death based on cN when nearby lymph nodes are involved:
@@ -452,15 +460,15 @@ exp(0.5702)
 exp(1.4731)
 exp(1.3122)
 ```
-Interpretations: 
+Interpretations:
 1.All the tumor size have positive association with the risk of death
 2. Proximity of N1 lymph nodes has 76% more chances of death as compared to N0
 3. Proximity of N2 lymph nodes has 336% more chances of death as compared to N0
 4. Proximity of N3 lymph nodes has 271% more chances of death as compared to N0
-5. Patient with Proximity of N2 lymph nodes has the highest risk of death 
+5. Patient with Proximity of N2 lymph nodes has the highest risk of death
 
 
-4. Difference in risk of death based on cM when distant metastasis (spread of cancer from one part of the body to another) are involved: 
+4. Difference in risk of death based on cM when distant metastasis (spread of cancer from one part of the body to another) are involved:
 ```{r}
 summary(glm(death ~ cM, data = lungSCC, family = "binomial"))
 ```
@@ -470,7 +478,7 @@ exp(0.2744)
 ```
 Interpretations:
 1.All Distant metastasis  have positive association with the risk of death
-2.M3 Distant metastasis  has 31 % higher chances of risk of death as compared to M1 
+2.M3 Distant metastasis  has 31 % higher chances of risk of death as compared to M1
 
 
 5. Difference in risk of death based on pT Peripheral Lung SCC size of Tumor:
@@ -540,7 +548,7 @@ exp(15.8626)
 ```{r}
 summary(glm(death ~ Smoking_state, data = lungSCC, family = "binomial"))
 ```
-Interpretation : 
+Interpretation :
 1.Being a current smoker , ex smoker and non smoker has negative association with death .
 2.No significant relation between Smoking State and death
 
@@ -592,14 +600,14 @@ exp(2.0974)
 
 ```
 Interpretation :
-1.We can see that No operation ,pneumonectomy and PLN biopsy has postive effect on death while segmentectomy has negative effect 
+1.We can see that No operation ,pneumonectomy and PLN biopsy has postive effect on death while segmentectomy has negative effect
 2.LN biopsy has significant relation with the prediction of death with p-value : 0.006946
-3. The odds ratio states that person who has undergone  LN biopsyhas 714% chances of death as compared to person undergone lobectomy 
+3. The odds ratio states that person who has undergone  LN biopsyhas 714% chances of death as compared to person undergone lobectomy
 
 
 *# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
 
-### Kaplan-Meier estimator 
+### Kaplan-Meier estimator
 
 Overall survival estimation:
 ```{r}
@@ -607,13 +615,13 @@ fit.KM <- survfit(Surv(OS, death) ~ 1, data = lungSCC)
 fit.KM
 ```
 Interpretation:
-From total 398 patients, 172  (43%) were death 
+From total 398 patients, 172  (43%) were death
 Half of lung cancer patient will death within 103 months
-RECHECK HOW TO INTERPREAT MEDIAN and KM plot WITH CENSORING DATA 
+RECHECK HOW TO INTERPREAT MEDIAN and KM plot WITH CENSORING DATA
 
 ```{r}
-ggsurvplot(fit.KM, 
-           legend.title = "Survival", 
+ggsurvplot(fit.KM,
+           legend.title = "Survival",
            xlab = "Months",  
            ylab = "Survival probability")
 ```
@@ -641,7 +649,7 @@ Interpretation
 fit_effusion <- coxph(Surv(OS, death)~Effusion, data=lungSCC)
 summary(fit_effusion)
 ```
-Interpretation: 
+Interpretation:
 CAREFUL, the following interpretation are right according to the numbers but wrong according to the meaning! We might not need them anyway because we reject this covariate!
 Interpretation should be: Patients with lung effusion have 5% higher (an not lower) risk of death than patients without lung effusion.
 
@@ -657,7 +665,7 @@ The summary output also gives upper and lower 95% confidence intervals for the h
 Finally, the output gives p-values for three alternative tests for overall significance of the model: The likelihood-ratio test, Wald test, and score logrank statistics. These three methods are asymptotically equivalent.
 
 *Conclusion:*
-However, with a p-value close to 1 (0.9) we can assume that there is no significant relationship between survival time and lung effusion. 
+However, with a p-value close to 1 (0.9) we can assume that there is no significant relationship between survival time and lung effusion.
 *We then reject the use of this covariate for the upcoming study.*
 
 
@@ -800,9 +808,9 @@ With a very low p-value of 5.22e-08 and a positive coefficient of 0.85, we can a
 (Only when n of each gr kind of similar)
 
 List of features which have a significant relationship with survival time (OS):
-- 
-- 
-- 
+-
+-
+-
 
 
 ## Comparison between 2 groups of patients based on observed metastasis after surgery
@@ -827,7 +835,7 @@ ggsurvplot(fit.KM_meta,
 
 
 
-Multivariates Cox Regression 
+Multivariates Cox Regression
 Start with the full model with all variables
 ```{r}
 
@@ -842,7 +850,7 @@ lungSCC_multiCox <- step(lungSCC_fullmodel)
 ```
 Interpretation:
 After backward selection, we found that the best model to predict survival time composes of 11 variables with the converted AIC 1827.39 from the original AIC  
-1846.56 
+1846.56
 
 Note that this backward selection migh not convert to global optimum
 ```{r}
@@ -852,8 +860,8 @@ Interpretation:
 1. The prediction concordance score of our multivariate model is 0.732
 
 2. Features that lead to a statistical significant higher risk (Shorter survival time) are
-   - Interstitial lung abnormalitites (ILA) 
-     Patients who have underlying lung disease with ILA shows 3 times higher risk than patients who have emphysema 
+   - Interstitial lung abnormalitites (ILA)
+     Patients who have underlying lung disease with ILA shows 3 times higher risk than patients who have emphysema
    - Age
      Patients that older than 60 years old have approximately 2 times higher risk than patients that younger than 60 years old
    - Size of tumor in central lung cancer patients (cT)
@@ -863,19 +871,19 @@ Interpretation:
      Peripheral lung cancer patients whom their cancers spread to lymph nodes within the lung or where the lung joins (N1), lymph nodes in the centre of the chest or under the windpipe brances off to each lung (N2), or lymph nodes on the opposite side of the chest from the affted lung or above the collar bone or at the top of the lung (N3) have approximately 2, 3 and 4 times higher risk than patients who show no nodal involvement.
    - Metastasis of peripheral lung cancer patients (pM)
      Peripheral lung cancer patients whom cancer spread to area outside the chest have 11 times higher risk than patients with no cancer spreading outside the lung
-   - Metastasis 
+   - Metastasis
      For both type of lung cancer, patients who have cancer spreading outside the lung have approximately twice higher risk than those without metastasis
-   - FEV1/FVC ratio 
+   - FEV1/FVC ratio
      Every increasing unit of FEV1/FVC ratio unit will also increase the risk with approximately 1%
 
-   
+
 3.  Features that lead to a statistical significant lower risk (Longer survival time) are  
    - No underlying lung disease
-     Without underlying lung disease, patients have approximately 40% lower risk than patients with emphysema 
+     Without underlying lung disease, patients have approximately 40% lower risk than patients with emphysema
    - No smoking history
      Patients who do not smoke have 80% lower risk than patients who have unknown record about smoking
 
-   
+
 Bring all significant feature to make another candidate model
 ```{r}
 
@@ -885,7 +893,7 @@ summary(lungSCC_multiCox_2)
 
 ```
 Interpretation:
-The concordance score of this model is less than the previous one which means the first model is better. 
+The concordance score of this model is less than the previous one which means the first model is better.
 
 Since lungSCC_multiCox_2 is the nested model of lungSCC_multiCox, to compare both model we will use Likelihood Ratio Test (LRT)
 
@@ -895,5 +903,5 @@ Compaing nested model: LRT
 anova(lungSCC_multiCox_2, lungSCC_multiCox)
 ```
 Interpretation:
-Non significant p-value indicates that there is no significant different in the goodness of fit between these 2 models. 
+Non significant p-value indicates that there is no significant different in the goodness of fit between these 2 models.
 Even lungSCC_multiCox model is more complex than lungSCC_multiCox_2 but it has higher concordance score, therefore; we will go for this one.
