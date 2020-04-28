@@ -46,33 +46,17 @@ lungSCC_raw <- read_csv("LungCancer.csv",
                                        .default = 'c'))
 ```
 
-Explore the dataset
-# Note: Be careful about the interpretation of this chunk
-since some features are divided in class by number 
-For example, Necrosis is divided into 3 classes; normal = 0, necrosis =  1, cavitization = 2
-If we run this chunk we will get, mean of necrosis = 0.4171 >> Not the real data distribution of necrosis
-Therefore, the summary is useful for columns with the real numerical data only (age for example)
-
-To observe the distribution of features that use number to classify their classes, use command "table" as indicated in the next chunck of code
+# Explore the dataset: 
+    - For classification data, use "table" 
+    - For numerical data: use "table" + "summary" 
+      (Summary to define basic descriptive statistic, Table to check null value)
 
 ```{r}
-names(lungSCC_raw)
-str(lungSCC_raw)
-dim(lungSCC_raw)
-head(lungSCC_raw)
-summary(lungSCC_raw)
-```
-
-Check null value and data classification for all 20 variables.
-Use table for classification and Logical column to see how they distribute.
-Count null value in decimal column (OS)
-
-```{r}
-table(lungSCC_raw$Location, useNA="always")
-table(lungSCC_raw$death, useNA="always")
+dim(lungSCC_raw)  # Check total patients + columns 
 
 
 # Radiologic features
+table(lungSCC_raw$Location, useNA="always")
 table(lungSCC_raw$Obst_pn_or_plugging, useNA="always")
 table(lungSCC_raw$Necrosis, useNA="always")
 table(lungSCC_raw$Underlying_lung, useNA="always")
@@ -81,7 +65,9 @@ table(lungSCC_raw$Effusion, useNA="always")
 # Clinicopathologic features
 table(lungSCC_raw$Sex, useNA="always")
 table(lungSCC_raw$Age, useNA="always")
+summary(lungSCC_raw$Age)
 table(lungSCC_raw$LN_ratio, useNA="always")
+summary(lungSCC_raw$LN_ratio)
 table(lungSCC_raw$cT, useNA="always")
 table(lungSCC_raw$cN, useNA="always")
 table(lungSCC_raw$cM, useNA="always")
@@ -90,10 +76,16 @@ table(lungSCC_raw$pN, useNA="always")
 table(lungSCC_raw$pM, useNA="always")
 table(lungSCC_raw$Smoking_state, useNA="always")
 table(lungSCC_raw$FEV1_FVC, useNA="always")
-table(lungSCC_raw$CEA, useNA="always")
+summary(lungSCC_raw$FEV1_FVC)
+table(lungSCC_raw$CEA)
+summary(lungSCC_raw$CEA)
 table(lungSCC_raw$op_type, useNA="always")
+table(lungSCC_raw$death, useNA="always")
 table(lungSCC_raw$meta, useNA="always")
+table(lungSCC_raw$OS, useNA="always")
+summary(lungSCC_raw$OS)
 ```
+
 
 Define the meaning of each label to make it easier for interpretation
 
