@@ -667,9 +667,11 @@ Methods used: Cox Proportional Hazards Model
 
 1. patient with and without obstructive pneumonitis/ atelectais:
 ```{r}
-
+fit_Obst_pn_or_plugging <- coxph(Surv(OS, death)~Obst_pn_or_plugging, data=lungSCC)
+summary(fit_Obst_pn_or_plugging)
 ```
-Interpretation
+Interpretation:
+As the p-value is 0.099 , we can conclude that Obstructive pneumonitis/ atelectasis has no significant impact on the survival time .
 
 2. patient with and without lung effusion:
 ```{r}
@@ -700,9 +702,13 @@ However, with a p-value close to 1 (0.9) we can assume that there is no signific
 
 3. cell necrosis:
 ```{r}
+fit_necrosis <- coxph(Surv(OS, death)~Necrosis, data=lungSCC)
+summary(fit_necrosis)
 
 ```
-Interpretation
+Interpretation:
+With a negative coef -0.5734 and p-value as low as 0.033 we can assume that there is a significant negative relationship between survival time and the no remark in necrosis.
+
 
 4. underlying lung disease:
 ```{r}
@@ -758,6 +764,7 @@ summary(fit_Sex)
 ```
 Interpretation:
 With a negative coef of -0.2719 and p-value close to 0.05 , we can conclude that Sex doesnt have major impact on the survival .
+*We then reject the use of this covariate for the upcoming study.*
 
 2. Age:
 ```{r}
@@ -766,6 +773,7 @@ summary(fit_Age)
 ```
 Interpretation : 
 With a positive coef and p-value as low as 0.00103, we can assume that there is a significant positive relationship between survival time and the age.
+*We then select this covariate as significant for the upcoming study.*
 
 3. lymph node ratio:
 ```{r}
@@ -798,7 +806,7 @@ summary(fit_cT)
 
 Interpretation:
 With a positive coefficient of 1.14 and low p-value of 2.99e-05, we can assume that there is a significant positive relationship between survival time and the CT3 tumor size.
-
+*We then select this covariate as significant for the upcoming study.*
 
 5. cN when nearby lymph nodes are involved:
 ```{r}
@@ -807,7 +815,7 @@ summary(fit_cN)
 ```
 Interpretation:
 With a positive coefficient of 2.1621 and low p-value of  0.000321 , we can assume that there is a significant positive relationship between survival time and the cN3 near by nymph nodes.
-
+*We then select this covariate as significant for the upcoming study.*
 6. cM when distant metastasis are involved:
 
 ```{r}
@@ -816,7 +824,7 @@ summary(fit_cM)
 ```
 Interpretation:
 With a positive coefficient of 2.1621 and high p-value of  0.667 , we can assume that there is a no significant  relationship between survival time and the cM distant metasis
-
+*We then reject the use of this covariate for the upcoming study.*
 
 7. pT Peripheral Lung SCC size of Tumor:
 ```{r}
@@ -862,6 +870,7 @@ summary(fit_Smoking_state)
 
 Interpretation: 
 With all the p-value being greater than 0.05, we can conclude that smoking state has no effect on the survival .
+*We then reject the use of this covariate for the upcoming study.* 
 
 11. FEV1_FVC pulmonary function test
 ```{r}
@@ -895,7 +904,7 @@ summary(fit_op_type)
 ```
 Interpretation:
 With a very low p-value of 2.17e-06  and a positive coefficient of 1.5034, we can assume that there is a highly significant positive relationship between survival time and the segmentectomy surgery.
-
+*We then select this covariate as significant for the upcoming study.*
 
 
 14. patient with and without observed metastasis after surgery (meta)
