@@ -344,8 +344,8 @@ of death than emphysema with p-value 0.007.
 2. No underlying lung disease has statistically significant lower risk than emphysema with p-value 0.04.
 
 ```{r}
-exp(1.81475)
-exp(-0.45911)
+exp(1.76823)
+exp(-0.51250)
 ```
 Interpretation:
 Risk of death of lung cancer patients with ILA is almost 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
