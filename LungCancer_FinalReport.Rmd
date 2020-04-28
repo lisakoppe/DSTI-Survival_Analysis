@@ -627,6 +627,12 @@ Interpretation :
 
 *# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
 
+# Check censoring coding
++ = Patient survive (at least until that time point of the study)
+```{r}
+with(lungSCC, Surv(OS, death))
+```
+
 ### Kaplan-Meier estimator
 
 Overall survival estimation:
