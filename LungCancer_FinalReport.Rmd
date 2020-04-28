@@ -1185,7 +1185,7 @@ The logrank test:
 survdiff(Surv(OS, death)~meta, data=lungSCC)
 ```
 Interpretation:
-
+Logrank test result shows a significant difference in survival between these groups of patients (p=2e-08).
 
 
 ## Comparision between 2 groups of patients based on Necrosis
