@@ -682,7 +682,7 @@ summary(fit_UndLung)
 ```
 Interpretation:
 *1. Statistical significance:*
-The Wald statistic value z, corresponds to the ratio of each regression coefficient to its standard error (z = coef/se(coef)). The wald statistic evaluates, whether the beta (β) coefficient of a given variable is statistically significantly different from 0. Here, we can conclude that the variable Underlying_lung have highly statistically significant coefficients (z=4.27 for ILA and z=-2.23 for no remark).
+The Wald statistic value z, corresponds to the ratio of each regression coefficient to its standard error (z = coef/se(coef)). The wald statistic evaluates, whether the beta (β) coefficient of a given variable is statistically significantly different from 0. Here, we can conclude that the variable Underlying_lung has highly statistically significant coefficients (z=4.27 for ILA and z=-2.23 for no remark).
 *2. The regression coefficient:*
 With a value of 1.21, the sign of the regression coefficient for ILA is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable.
 With a value of -0.40, the sign of the regression coefficient for no remark is negative which means that the hazard (risk of death) is lower, and thus the prognosis better, for subjects with higher values of that variable.
@@ -732,7 +732,18 @@ fit_LNratio <- coxph(Surv(OS, death)~LN_ratio, data=lungSCC)
 summary(fit_LNratio)
 ```
 Interpretation:
+*1. Statistical significance:*
+We can conclude that the variable LN_ratio has a statistically significant coefficient (z=2.59).
+*2. The regression coefficient:*
+With a value of 0.84, the sign of the regression coefficient is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable.
+*3. Hazard ratios (HR):*
+The exponentiated coefficient (exp(coef)=exp(0.84)=2.33) gives the effect size of covariates. Here, a patient with a LN ratio greater than 0 increases the hazard by a factor of 2.33, or 133%. A LN ratio greater than 0 is associated with a bad prognostic.
+*4. Confidence intervals of the hazard ratios:*
+The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)) lower 95% bound=1.229, upper 95% bound=4.414.
+
+*Conclusion:*
 With a positive coefficient of 0.84 and low p-value of 0.009, we can assume that there is a significant positive relationship between survival time and the lymph node ratio.
+*We then select this covariate as significant for the upcoming study.*
 
 
 4. cT Central Lung SCC size of Tumor:
@@ -750,7 +761,8 @@ fit_pT <- coxph(Surv(OS, death)~pT, data=lungSCC)
 summary(fit_pT)
 ```
 Interpretation:
-With a positive coefficient of 1.99 and low p-value of 0.008, we can assume that there is a significant positive relationship between survival time and the pT3 tumor size.
+With a positive coefficient of 1.99 and a low p-value of 0.008, we can assume that there is a significant positive relationship between survival time and the pT3 tumor size.
+*We then select this covariate as significant for the upcoming study.*
 
 
 8. pN when nearby lymph nodes are involved
@@ -759,7 +771,8 @@ fit_pN <- coxph(Surv(OS, death)~pN, data=lungSCC)
 summary(fit_pN)
 ```
 Interpretation:
-With a positive coefficient of 0.86 and very low p-value of 1.51e-05, we can assume that there is a highly significant positive relationship between survival time and the pN2 tumor size.
+With a positive coefficient of 0.86 and a very low p-value of 1.51e-05, we can assume that there is a highly significant positive relationship between survival time and the pN2 nearby lymph nodes involved.
+*We then select this covariate as significant for the upcoming study.*
 
 
 9. pM when distant metastasis are involved
@@ -768,7 +781,8 @@ fit_pM <- coxph(Surv(OS, death)~pM, data=lungSCC)
 summary(fit_pM)
 ```
 Interpretation: #CAREFUL WITH THIS ONE
-With a positive coefficient of 1.77 and very low p-value of 0.0005, we can assume that there is a highly significant positive relationship between survival time and the pM1b tumor size.
+With a positive coefficient of 1.77 and very low p-value of 0.0005, we can assume that there is a highly significant positive relationship between survival time and the pM1b distant metastasis involved.
+*We then select this covariate as significant for the upcoming study.*
 
 
 10. smoking state:
@@ -780,7 +794,8 @@ fit_FEV1FVC <- coxph(Surv(OS, death)~FEV1_FVC, data=lungSCC)
 summary(fit_FEV1FVC)
 ```
 Interpretation:
-With a p-value of 0.13 we can assume that there is no significant relationship between survival time and the FEV1_FVC pulmonary function test.
+With a p-value of 0.1 we can assume that there is no significant relationship between survival time and the FEV1_FVC pulmonary function test.
+*We then reject the use of this covariate for the upcoming study.*
 
 
 12. CEA serum
@@ -789,7 +804,8 @@ fit_CEA <- coxph(Surv(OS, death)~CEA, data=lungSCC)
 summary(fit_CEA)
 ```
 Interpretation:
-With a p-value of 0.60 we can assume that there is no significant relationship between survival time and the CEA serum.
+With a p-value of 0.6 we can assume that there is no significant relationship between survival time and the CEA serum.
+*We then reject the use of this covariate for the upcoming study.*
 
 
 13. the type of operation undergone:
@@ -801,16 +817,32 @@ fit_meta <- coxph(Surv(OS, death)~meta, data=lungSCC)
 summary(fit_meta)
 ```
 Interpretation:
+*1. Statistical significance:*
+Here, we can conclude that the variable meta have astatistically significant coefficient (z=5.444).
+*2. The regression coefficient:*
+With a value of 0.85, the sign of the regression coefficient is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group, that is, presence vs absence. The beta coefficient for meta=0.85 indicates that patients with observed metastasis have higher risk of death (lower survival rates) than patients without metastasis.
+*3. Hazard ratios (HR):*
+The exponentiated coefficient (exp(coef)=exp(0.85)=2.33) gives the effect size of covariates. Here, a patient with observed metastasis increases the hazard by a factor of 2.33, or 133%. Having observed metastasis is associated with bad prognostic.
+*4. Confidence intervals of the hazard ratios:*
+The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)), lower 95% bound=1.719, upper 95% bound=3.163.
+*5. Global statistical significance of the model:*
+Finally, the output gives p-values for three alternative tests for overall significance of the model: The likelihood-ratio test, Wald test, and score logrank statistics. These three methods are asymptotically equivalent.
+
+*Conclusion:*
 With a very low p-value of 5.22e-08 and a positive coefficient of 0.85, we can assume that there is a highly significant positive relationship between survival time and the observation of metastasis after surgery.
+*We then select this covariate as significant for the upcoming study.*
 
 
 *# Part 3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
 (Only when n of each gr kind of similar)
 
 List of features which have a significant relationship with survival time (OS):
--
--
--
+- Underlying_lung
+- LN_ratio > the repartition of the population in the groups is too unbalanced so we reject this covariate.
+- pT
+- pN
+- pM
+- meta
 
 
 ## Comparison between 2 groups of patients based on observed metastasis after surgery
