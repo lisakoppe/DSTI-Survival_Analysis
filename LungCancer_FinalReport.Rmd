@@ -107,6 +107,8 @@ lungSCC <- mutate(lungSCC_raw,
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
                                          ifelse(Underlying_lung==1, "Emphysema", "ILA")),
                   
+                  Effusion=factor(Effusion, levels=c("0", "1"), labels=c("Absent", "Present")),
+                  
                   Sex=factor(Sex, levels=c("F", "M")),
                   
                   AG=ifelse((Age<60), "LT60", "OV60"),
@@ -134,7 +136,6 @@ Recheck the distribution of age after regrouped
 ```{r}
 table(lungSCC$AG)
 ```
-
 
 
 
@@ -598,10 +599,9 @@ Interpretation :
 
 *# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
 
-### Kaplan-Meyer estimator 
+### Kaplan-Meier estimator 
 
-Overall survival estimation
-
+Overall survival estimation:
 ```{r}
 fit.KM <- survfit(Surv(OS, death) ~ 1, data = lungSCC)
 fit.KM
@@ -611,14 +611,12 @@ From total 398 patients, 172  (43%) were death
 Half of lung cancer patient will death within 103 months
 RECHECK HOW TO INTERPREAT MEDIAN and KM plot WITH CENSORING DATA 
 
-
 ```{r}
 ggsurvplot(fit.KM, 
            legend.title = "Survival", 
            xlab = "Months",  
            ylab = "Survival probability")
 ```
-
 
 
 Methods used: Cox Proportional Hazards Model
@@ -632,34 +630,66 @@ Methods used: Cox Proportional Hazards Model
 4. underlying lung disease
 ----
 
-1. patient with and without obstructive pneumonitis/ atelectais
+1. patient with and without obstructive pneumonitis/ atelectais:
 ```{r}
 
 ```
 Interpretation
 
-2. patient with and without lung effusion
+2. patient with and without lung effusion:
 ```{r}
 fit_effusion <- coxph(Surv(OS, death)~Effusion, data=lungSCC)
 summary(fit_effusion)
 ```
-Interpretation:
-With a p-value close to 1 (0.92) we can assume that there is no significant relationship between survival time and lung effusion.
+Interpretation: 
+CAREFUL, the following interpretation are right according to the numbers but wrong according to the meaning! We might not need them anyway because we reject this covariate!
+Interpretation should be: Patients with lung effusion have 5% higher (an not lower) risk of death than patients without lung effusion.
 
-3. cell necrosis
+*1. Statistical significance:*
+The Wald statistic value z, corresponds to the ratio of each regression coefficient to its standard error (z = coef/se(coef)). The wald statistic evaluates, whether the beta (β) coefficient of a given variable is statistically significantly different from 0. Here, we can conclude that the variable effusion doesn't have statistically significant coefficients (z=-0.104, close to 0).
+*2. The regression coefficient:*
+With a value of -0.05, the sign of the regression coefficient is negative which means that the hazard (risk of death) is lower, and thus the prognosis better, for subjects with higher values of that variable. The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group, that is, presence vs absence. The beta coefficient for effusion=-0.05 indicates that patients with lung effusion have lower risk of death (higher survival rates) than patients without lung effusion.
+*3. Hazard ratios (HR):*
+The exponentiated coefficient (exp(coef)=exp(-0.05)=0.95) gives the effect size of covariates. Here, a patient with lung effusion reduces the hazard by a factor of 0.95, or 5%. Having lung effusion is associated with good prognostic.
+*4. Confidence intervals of the hazard ratios:*
+The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)), lower 95% bound=0.3518, upper 95% bound=2.557.
+*5. Global statistical significance of the model:*
+Finally, the output gives p-values for three alternative tests for overall significance of the model: The likelihood-ratio test, Wald test, and score logrank statistics. These three methods are asymptotically equivalent.
+
+*Conclusion:*
+However, with a p-value close to 1 (0.9) we can assume that there is no significant relationship between survival time and lung effusion. 
+*We then reject the use of this covariate for the upcoming study.*
+
+
+3. cell necrosis:
 ```{r}
 
 ```
 Interpretation
 
-4. underlying lung disease
+4. underlying lung disease:
 ```{r}
 fit_UndLung <- coxph(Surv(OS, death)~Underlying_lung, data=lungSCC)
 summary(fit_UndLung)
 ```
 Interpretation:
-1. With a very low p-value of 1.95e-05 and a positive coefficient of 1.21, we can assume that there is a highly significant positive relationship between survival time and Interstitial lung abnormalities (ILA).
-2. No underlying lung disease has a statistically significant negative relationship with the survival time with a p-value of 0.02.
+*1. Statistical significance:*
+The Wald statistic value z, corresponds to the ratio of each regression coefficient to its standard error (z = coef/se(coef)). The wald statistic evaluates, whether the beta (β) coefficient of a given variable is statistically significantly different from 0. Here, we can conclude that the variable Underlying_lung have highly statistically significant coefficients (z=4.27 for ILA and z=-2.23 for no remark).
+*2. The regression coefficient:*
+With a value of 1.21, the sign of the regression coefficient for ILA is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable.
+With a value of -0.40, the sign of the regression coefficient for no remark is negative which means that the hazard (risk of death) is lower, and thus the prognosis better, for subjects with higher values of that variable.
+The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group, that is, ILA vs emphysema and no remark vs emphysema. The beta coefficient for ILA=1.21 indicates that patients with ILA have higher risk of death (lower survival rates) than patients with emphysema. The beta coefficient for no remark=-0.40 indicates that patients with no remark have lower risk of death (higher survival rates) than patients with emphysema.
+*3. Hazard ratios (HR):*
+The exponentiated coefficient (exp(coef)=exp(1.21)=3.35 and exp(coef)=exp(-0.40)=0.67) gives the effect size of covariates. Here, a patient with ILA increases the hazard by a factor of 3.35, or 235%. Having ILA is associated with bad prognostic. A patient without ILA nor emphysema decreases the hazard by a factor of 0.67, or 33%. Having neither ILA nor emphysema is associated with good prognostic.
+*4. Confidence intervals of the hazard ratios:*
+The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)):
+- Lower 95% bound=1.9224, upper 95% bound=5.8270 for ILA.
+- Lower 95% bound=0.4706, upper 95% bound=0.9519 for the absence of ILA and emphysema.
+
+*Conclusion:*
+With a very low p-value of 1.95e-05 and a positive coefficient of 1.21, we can assume that there is a highly significant positive relationship between survival time and Interstitial lung abnormalities (ILA).
+No underlying lung disease also has a statistically significant negative relationship with the survival time with a p-value of 0.02.
+*We then select this covariate as significant for the upcoming study.*
 
 
 ## Relationship between clinicopathologic features and survival time (OS)
