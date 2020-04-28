@@ -1231,29 +1231,31 @@ confint(lungSCC_multiCox)
 Interpretation:
 1. The prediction concordance score of our multivariate model is 0.732
 
-2. Features that lead to a statistical significant higher risk (Shorter survival time) are
-   - Interstitial lung abnormalitites (ILA)
-     Patients who have underlying lung disease with ILA shows 3 times higher risk than patients who have emphysema
-   - Age
-     Patients that older than 60 years old have approximately 2 times higher risk than patients that younger than 60 years old
-   - Size of tumor in central lung cancer patients (cT)
-     Patients in criteria T2 (Tumor diameter 2.1-4 cm) and T3 (Tumor diameter 4.1-6 cm) have 2 and 3 times higher risk than patients with criteria T1 (Tumor diameter less than or equal to 0 cm), respectively.
+2. Underlying lung disease: 
+   Patients who have ILA show 3 times higher risk (Shorter survival time) and patients without underlying lung disease have approximately 40% lower risk than those of patients with emphysema
+   
+3. Age: 
+   Patients that older than 60 years old have approximately 2 times higher risk than patients that younger than 60 years old of every 1 year older
+   
+4. Size of tumor in central lung cancer patients (cT):
+   Patients in criteria T2 (Tumor diameter 2.1-4 cm) and T3 (Tumor diameter 4.1-6 cm) have 2 and 3 times higher risk than patients with criteria T1 (Tumor diameter less than or equal to 0 cm), respectively.
     Note that no significant different between patient cT1 and cT4 maybe because we have little number of cT4 patients (n=15)
-   - Nearby lymph nodes that are involved in peripheral lung cancer patients (pN)
-     Peripheral lung cancer patients whom their cancers spread to lymph nodes within the lung or where the lung joins (N1), lymph nodes in the centre of the chest or under the windpipe brances off to each lung (N2), or lymph nodes on the opposite side of the chest from the affted lung or above the collar bone or at the top of the lung (N3) have approximately 2, 3 and 4 times higher risk than patients who show no nodal involvement.
-   - Metastasis of peripheral lung cancer patients (pM)
-     Peripheral lung cancer patients whom cancer spread to area outside the chest have 11 times higher risk than patients with no cancer spreading outside the lung
-   - Metastasis
-     For both type of lung cancer, patients who have cancer spreading outside the lung have approximately twice higher risk than those without metastasis
-   - FEV1/FVC ratio
-     Every increasing unit of FEV1/FVC ratio unit will also increase the risk with approximately 1%
+    
+5. Nearby lymph nodes that are involved in peripheral lung cancer patients (pN);
+   Peripheral lung cancer patients whom their cancers spread to lymph nodes within the lung or where the lung joins (N1), lymph nodes in the centre of the chest or under the windpipe brances off to each lung (N2), or lymph nodes on the opposite side of the chest from the affted lung or above the collar bone or at the top of the lung (N3) have approximately 2, 3 and 4 times higher risk than patients who show no nodal involvement.
 
+6. Metastasis of peripheral lung cancer patients (pM):
+   Peripheral lung cancer patients whom cancer spread to area outside the chest have 11 times higher risk than patients with no cancer spreading outside the lung
 
-3.  Features that lead to a statistical significant lower risk (Longer survival time) are  
-   - No underlying lung disease
-     Without underlying lung disease, patients have approximately 40% lower risk than patients with emphysema
-   - No smoking history
-     Patients who do not smoke have 80% lower risk than patients who have unknown record about smoking
+7. Smoking history:
+   Patients who do not smoke have 80% lower risk than patients who have unknown record about smoking
+
+8. FEV1/FVC ratio 
+   Every increasing unit of FEV1/FVC ratio unit will also increase the risk with approximately 1%
+   
+9. Metastasis 
+   For both type of lung cancer, patients who have cancer spreading outside the lung have approximately twice higher risk than those without metastasis
+
 
 
 Bring all significant feature to make another candidate model
