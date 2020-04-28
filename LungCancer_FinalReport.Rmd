@@ -299,7 +299,7 @@ fit <- glm(death~Necrosis, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. No cell necrosis observation shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
+1. No remakable cell necrosis shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
 2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
 
 ```{r}
