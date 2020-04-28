@@ -963,6 +963,12 @@ ggsurvplot(fit.KM_under,
            ylab = "Survival probability")
 ```
 
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~Underlying_lung, data=lungSCC)
+```
+Interpretation:
+
 
 ## Comparison between 2 groups of patients based on Peripheral Lung SCC size of Tumor
 
@@ -984,6 +990,12 @@ ggsurvplot(fit.KM_pT,
            ylab = "Survival probability")
 ```
 
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pT, data=lungSCC)
+```
+Interpretation:
+
 
 ## Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved
 
@@ -1004,6 +1016,11 @@ ggsurvplot(fit.KM_pN,
            xlab = "Months",
            ylab = "Survival probability")
 ```
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pN, data=lungSCC)
+```
+Interpretation:
 
 
 ## Comparison between 2 groups of patients based on pM when distant metastasis are involved
@@ -1026,6 +1043,12 @@ ggsurvplot(fit.KM_pM,
            ylab = "Survival probability")
 ```
 
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pM, data=lungSCC)
+```
+Interpretation:
+
 
 ## Comparison between 2 groups of patients based on observed metastasis after surgery
 
@@ -1046,6 +1069,13 @@ ggsurvplot(fit.KM_meta,
            xlab = "Months",
            ylab = "Survival probability")
 ```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~meta, data=lungSCC)
+```
+Interpretation:
+
 
 
 
