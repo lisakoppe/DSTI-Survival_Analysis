@@ -267,7 +267,7 @@ Patients with lung effusion have 5% higher risk of death than patients without l
 Determine the relationship between categorical continuous variables
 
 Hypotheses:
-H0: there is no different in odds between that specific group and reference group 
+H0: there is no different in odds between that specific group and reference group
 H1: Odds of that specific group and reference group is statistically significant
 
 Interpretation:
@@ -672,6 +672,7 @@ summary(fit_Obst_pn_or_plugging)
 ```
 Interpretation:
 As the p-value is 0.099 , we can conclude that Obstructive pneumonitis/ atelectasis has no significant impact on the survival time .
+*We then reject the use of this covariate for the upcoming study.*
 
 2. patient with and without lung effusion:
 ```{r}
@@ -708,6 +709,7 @@ summary(fit_necrosis)
 ```
 Interpretation:
 With a negative coef -0.5734 and p-value as low as 0.033 we can assume that there is a significant negative relationship between survival time and the no remark in necrosis.
+*We then select this covariate as significant for the upcoming study.*
 
 
 4. underlying lung disease:
@@ -771,7 +773,7 @@ With a negative coef of -0.2719 and p-value close to 0.05 , we can conclude that
 fit_Age <- coxph(Surv(OS, death)~AG, data=lungSCC)
 summary(fit_Age)
 ```
-Interpretation : 
+Interpretation :
 With a positive coef and p-value as low as 0.00103, we can assume that there is a significant positive relationship between survival time and the age.
 *We then select this covariate as significant for the upcoming study.*
 
@@ -808,6 +810,7 @@ Interpretation:
 With a positive coefficient of 1.14 and low p-value of 2.99e-05, we can assume that there is a significant positive relationship between survival time and the CT3 tumor size.
 *We then select this covariate as significant for the upcoming study.*
 
+
 5. cN when nearby lymph nodes are involved:
 ```{r}
 fit_cN <- coxph(Surv(OS, death)~cN, data=lungSCC)
@@ -816,6 +819,8 @@ summary(fit_cN)
 Interpretation:
 With a positive coefficient of 2.1621 and low p-value of  0.000321 , we can assume that there is a significant positive relationship between survival time and the cN3 near by nymph nodes.
 *We then select this covariate as significant for the upcoming study.*
+
+
 6. cM when distant metastasis are involved:
 
 ```{r}
@@ -825,6 +830,7 @@ summary(fit_cM)
 Interpretation:
 With a positive coefficient of 2.1621 and high p-value of  0.667 , we can assume that there is a no significant  relationship between survival time and the cM distant metasis
 *We then reject the use of this covariate for the upcoming study.*
+
 
 7. pT Peripheral Lung SCC size of Tumor:
 ```{r}
@@ -868,9 +874,9 @@ fit_Smoking_state <- coxph(Surv(OS, death)~Smoking_state, data=lungSCC)
 summary(fit_Smoking_state)
 ```
 
-Interpretation: 
+Interpretation:
 With all the p-value being greater than 0.05, we can conclude that smoking state has no effect on the survival .
-*We then reject the use of this covariate for the upcoming study.* 
+*We then reject the use of this covariate for the upcoming study.*
 
 11. FEV1_FVC pulmonary function test
 ```{r}
@@ -941,6 +947,118 @@ List of features which have a significant relationship with survival time (OS):
 - pN
 - pM
 - meta
+- Necrosis
+- Age
+- cT
+- cN
+- op_type
+
+
+## Comparison between 2 groups of patients based on underlying lung disease
+
+```{r}
+fit.KM_under <- survfit(Surv(OS, death)~Underlying_lung, data=lungSCC)
+fit.KM_under
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_under,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Underlying lung disease",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~Underlying_lung, data=lungSCC)
+```
+Interpretation:
+
+
+## Comparison between 2 groups of patients based on Peripheral Lung SCC size of Tumor
+
+```{r}
+fit.KM_pT <- survfit(Surv(OS, death)~pT, data=lungSCC)
+fit.KM_pT
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pT,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Peripheral Lung SCC size of Tumor",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pT, data=lungSCC)
+```
+Interpretation:
+
+
+## Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved
+
+```{r}
+fit.KM_pN <- survfit(Surv(OS, death)~pN, data=lungSCC)
+fit.KM_pN
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pN,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "pN when nearby lymph nodes are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pN, data=lungSCC)
+```
+Interpretation:
+
+
+## Comparison between 2 groups of patients based on pM when distant metastasis are involved
+
+```{r}
+fit.KM_pM <- survfit(Surv(OS, death)~pM, data=lungSCC)
+fit.KM_pM
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pM,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "pM when distant metastasis are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~pM, data=lungSCC)
+```
+Interpretation:
 
 
 ## Comparison between 2 groups of patients based on underlying lung disease
@@ -1089,9 +1207,51 @@ The logrank test:
 survdiff(Surv(OS, death)~meta, data=lungSCC)
 ```
 Interpretation:
+
+
+
+## Comparision between 2 groups of patients based on Necrosis
+
+```{r}
+fit.KM_Age <- survfit(Surv(OS, death)~AG, data=lungSCC)
+fit.KM_Age
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_Age,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Observation of Age",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+=======
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~meta, data=lungSCC)
+```
+Interpretation:
 Logrank test result shows a significant difference in survival between these groups of patients (p=2e-08).
 
 
+
+```{r}
+fit.Necrosis <- survfit(Surv(OS, death)~Necrosis, data=lungSCC)
+fit.Necrosis
+```
+
+
+```{r}
+ggsurvplot(fit.KM_Necrosis,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Observation of Necrosis",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
 
 Multivariates Cox Regression
 Start with the full model with all variables
