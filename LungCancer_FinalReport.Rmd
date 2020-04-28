@@ -675,6 +675,8 @@ Interpretation
 ```{r}
 fit_effusion <- coxph(Surv(OS, death)~Effusion, data=lungSCC)
 summary(fit_effusion)
+
+confint(fit_effusion)
 ```
 Interpretation:
 CAREFUL, the following interpretation are right according to the numbers but wrong according to the meaning! We might not need them anyway because we reject this covariate!
@@ -706,6 +708,8 @@ Interpretation
 ```{r}
 fit_UndLung <- coxph(Surv(OS, death)~Underlying_lung, data=lungSCC)
 summary(fit_UndLung)
+
+confint(fit_UndLung)
 ```
 Interpretation:
 *1. Statistical significance:*
@@ -767,6 +771,8 @@ With a positive coef and p-value as low as 0.00103, we can assume that there is 
 ```{r}
 fit_LNratio <- coxph(Surv(OS, death)~LN_ratio, data=lungSCC)
 summary(fit_LNratio)
+
+confint(fit_LNratio)
 ```
 Interpretation:
 *1. Statistical significance:*
@@ -816,6 +822,8 @@ With a positive coefficient of 2.1621 and high p-value of  0.667 , we can assume
 ```{r}
 fit_pT <- coxph(Surv(OS, death)~pT, data=lungSCC)
 summary(fit_pT)
+
+confint(fit_pT)
 ```
 Interpretation:
 With a positive coefficient of 1.99 and a low p-value of 0.008, we can assume that there is a significant positive relationship between survival time and the pT3 tumor size.
@@ -826,6 +834,8 @@ With a positive coefficient of 1.99 and a low p-value of 0.008, we can assume th
 ```{r}
 fit_pN <- coxph(Surv(OS, death)~pN, data=lungSCC)
 summary(fit_pN)
+
+confint(fit_pN)
 ```
 Interpretation:
 With a positive coefficient of 0.86 and a very low p-value of 1.51e-05, we can assume that there is a highly significant positive relationship between survival time and the pN2 nearby lymph nodes involved.
@@ -836,6 +846,8 @@ With a positive coefficient of 0.86 and a very low p-value of 1.51e-05, we can a
 ```{r}
 fit_pM <- coxph(Surv(OS, death)~pM, data=lungSCC)
 summary(fit_pM)
+
+confint(fit_pM)
 ```
 Interpretation: #CAREFUL WITH THIS ONE
 With a positive coefficient of 1.77 and very low p-value of 0.0005, we can assume that there is a highly significant positive relationship between survival time and the pM1b distant metastasis involved.
@@ -855,6 +867,8 @@ With all the p-value being greater than 0.05, we can conclude that smoking state
 ```{r}
 fit_FEV1FVC <- coxph(Surv(OS, death)~FEV1_FVC, data=lungSCC)
 summary(fit_FEV1FVC)
+
+confint(fit_FEV1FVC)
 ```
 Interpretation:
 With a p-value of 0.1 we can assume that there is no significant relationship between survival time and the FEV1_FVC pulmonary function test.
@@ -865,6 +879,8 @@ With a p-value of 0.1 we can assume that there is no significant relationship be
 ```{r}
 fit_CEA <- coxph(Surv(OS, death)~CEA, data=lungSCC)
 summary(fit_CEA)
+
+confint(fit_CEA)
 ```
 Interpretation:
 With a p-value of 0.6 we can assume that there is no significant relationship between survival time and the CEA serum.
@@ -886,6 +902,8 @@ With a very low p-value of 2.17e-06  and a positive coefficient of 1.5034, we ca
 ```{r}
 fit_meta <- coxph(Surv(OS, death)~meta, data=lungSCC)
 summary(fit_meta)
+
+confint(fit_meta)
 ```
 Interpretation:
 *1. Statistical significance:*
@@ -914,6 +932,90 @@ List of features which have a significant relationship with survival time (OS):
 - pN
 - pM
 - meta
+
+
+## Comparison between 2 groups of patients based on underlying lung disease
+
+```{r}
+fit.KM_under <- survfit(Surv(OS, death)~Underlying_lung, data=lungSCC)
+fit.KM_under
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_under,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Underlying lung disease",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+
+## Comparison between 2 groups of patients based on Peripheral Lung SCC size of Tumor
+
+```{r}
+fit.KM_pT <- survfit(Surv(OS, death)~pT, data=lungSCC)
+fit.KM_pT
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pT,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Peripheral Lung SCC size of Tumor",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+
+## Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved
+
+```{r}
+fit.KM_pN <- survfit(Surv(OS, death)~pN, data=lungSCC)
+fit.KM_pN
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pN,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "pN when nearby lymph nodes are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+
+## Comparison between 2 groups of patients based on pM when distant metastasis are involved
+
+```{r}
+fit.KM_pM <- survfit(Surv(OS, death)~pM, data=lungSCC)
+fit.KM_pM
+```
+Interpretation
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_pM,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "pM when distant metastasis are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
 
 
 ## Comparison between 2 groups of patients based on observed metastasis after surgery
