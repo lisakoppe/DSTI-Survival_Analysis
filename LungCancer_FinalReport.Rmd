@@ -283,9 +283,10 @@ fit <- glm(death~Location, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer. To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
+The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer. 
+However, this different is not significant.
 
+To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
 
 ```{r}
 exp(0.2749)
@@ -309,12 +310,9 @@ fit <- glm(death~Necrosis, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. No remakable cell necrosis shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
-2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
+1. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
+2. The different in odds between no remarkable necrosis and lung cavitization is statistically significant with p-value 0.0248
 
-BE CAREFUL!
-Have to check if + and - sign in front of estimate is the higher/lower odds when compare to reference class only (Interpretation 2 is kind of sure but better to be rechecked)
-Or we can say that it also shows + and - relaitonship with death as we mention in Interpretation 1
 
 
 ```{r}
@@ -324,6 +322,16 @@ exp(-0.9776)
 Interpretation:
 Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  62% lower than patients with cavitization.
 
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Necrosis, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+95% interval shows that the risk of death of patients without lung cavitization range from 80% lower to around 10% higher than risk of death of lung cancer patients with lung cavitization
+
+HAVE TO RECHECK!!
+The way to interprete 95% interval when we have more than 2 groups
+
 
 3. Difference in risk of death based on underlying lung disease:
 ```{r}
@@ -331,9 +339,9 @@ fit <- glm(death~Underlying_lung, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.007.
-2. No underlying lung disease has statistically significant negative relationship with the risk of death with p-value 0.09
-2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema.
+1. Interstitial lung abnormalities (ILA) shows significantly higher risk
+of death than emphysema with p-value 0.007.
+2. No underlying lung disease has statistically significant lower risk than emphysema with p-value 0.04.
 
 ```{r}
 exp(1.81475)
@@ -341,6 +349,14 @@ exp(-0.45911)
 ```
 Interpretation:
 Risk of death of lung cancer patients with ILA is almost 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
+
+
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Underlying_lung, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+Patients without emphyma shows higher risk of death than those with emphyma around 0.8 to 26 times
 
 
 ## Relationship between clinicopathologic features and death
