@@ -2,11 +2,11 @@
 title: "Lung Cancer Prognosis"
 author: "Lisa KOPPE, Khwansiri NINPAN, Princy PAPPACHAN"
 date: "4/23/2020"
-output: pdf_document
+output: word_document
 ---
 
 Paper:
-[Integrated evaluation of clinical, pathological and radiological prognostic factors in squamous cell carcinoma of the lung ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6777828/)
+[Integrated evaluation of clinical, pathological and radiological prognostic factors in squamous cell carcinoma of the lung](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6777828/)
 
 # Import the necessary packages:
 
@@ -249,6 +249,7 @@ If those 2 sets of patient have equal odds (odds ratio = 1), that specific condi
 2. Difference in risk of death in patient with and without lung effusion
 ----
 
+
 1. Difference in risk of death in patient with and without obstructive pneumonitis/ atelectais:
 ```{r}
 with(lungSCC, fisher.test(table(death, Obst_pn_or_plugging)))
@@ -269,20 +270,6 @@ Interpretation:
 No relationship between death and lung effusion (p-value = 1)
 Patients with lung effusion have 5% higher risk of death than patients without lung effusion
 
-3. Difference in risk of death in patient with Age less than and over 60:
-```{r}
-with(lungSCC, fisher.test(table(death, AG)))
-```
-Interpretation:
-With p-value = 0.002378 less than the significance level, we can reject null hypothsis and can conclue that person with age more than 60 years have 4 times higher chances of dying than the younger people
-
-4. Difference in risk of death in patient based on gender
-```{r}
-with(lungSCC, fisher.test(table(death, Sex)))
-
-```
-Interpretation:
-As the p-value is 0.5974 , we can conclude that chances of death is independent of gender 
 
 ### Logistic regression
 
@@ -293,6 +280,7 @@ Determine the relationship between categorical continuous variables
 2. Difference in risk of death based on cell necrosis
 3. Difference in risk of death based on underlying lung disease
 ----
+
 
 1. Difference in risk of death based on cancer location:
 ```{r}
@@ -363,10 +351,29 @@ divided by odds for death in patient without specific condition
 If those 2 sets of patient have equal odds (odds ratio = 1), that specific condition are independent to death status
 
 ----
-X. Difference in risk of death in patient with and without observed metastasis after surgery (meta)
+1. Difference in risk of death in patient based on gender
+2. Difference in risk of death in patient with an age lower or greater than 60
+3. Difference in risk of death in patient with and without observed metastasis after surgery (meta)
 ----
 
-X. Difference in risk of death in patient with and without observed metastasis after surgery (meta):
+
+1. Difference in risk of death in patient based on gender:
+```{r}
+with(lungSCC, fisher.test(table(death, Sex)))
+```
+Interpretation:
+As the p-value is 0.5974 , we can conclude that chances of death is independent of gender 
+
+
+2. Difference in risk of death in patient with Age less than and over 60:
+```{r}
+with(lungSCC, fisher.test(table(death, AG)))
+```
+Interpretation:
+With p-value = 0.002378 less than the significance level, we can reject null hypothsis and can conclue that person with age more than 60 years have 4 times higher chances of dying than the younger people
+
+
+3. Difference in risk of death in patient with and without observed metastasis after surgery (meta):
 ```{r}
 with(lungSCC, table(death, meta))
 with(lungSCC, fisher.test(table(death, meta)))
@@ -384,15 +391,20 @@ The odds ratio (3.65) suggests that patients with observed metastasis after surg
 Determine the relationship between categorical continuous variables
 
 ----
-X. Difference in risk of death based on lymph node ratio
-X. Difference in risk of death based on pT peripheral tumor size
-X. Difference in risk of death based on pN peripheral tumor size
-X. Difference in risk of death based on pM peripheral tumor size
-X. Difference in risk of death based on FEV1_FVC pulmonary function test
-X. Difference in risk of death based on CEA serum
+1. Difference in risk of death based on lymph node ratio
+2. Difference in risk of death based on cT Central Lung SCC size of Tumor
+3. Difference in risk of death based on cN when nearby lymph nodes are involved
+4. Difference in risk of death based on cM when distant metastasis are involved
+5. Difference in risk of death based on pT Peripheral Lung SCC size of Tumor
+6. Difference in risk of death based on pN when nearby lymph nodes are involved
+7. Difference in risk of death based on pM when distant metastasis are involved
+8. Difference in risk of death based on the smoking state
+9. Difference in risk of death based on FEV1_FVC pulmonary function test
+10. Difference in risk of death based on CEA serum
+11. Difference in risk of death based on the type of operation undergone
 ----
 
-X. Difference in risk of death based on lymph node ratio:
+1. Difference in risk of death based on lymph node ratio:
 ```{r}
 with(lungSCC, table(death, LN_ratio))
 
@@ -407,20 +419,61 @@ Interpretation:
 3. Odds ratio doen't give any information here because of the continuous type of this variable.
 
 ```{r}
-# TRY TO SPLIT INTO RANGES
-fit <- glm(death~I(LN_ratio/4), family="binomial", data=lungSCC)
-summary(fit)
-
-exp(confint(glm(death~I(LN_ratio/4), family="binomial", data=lungSCC))[2,])
-```
-
-```{r}
-exp(5.5298)
+exp(1.38)
 ```
 Interpretation: odds ratio
 
 
-X. Difference in risk of death based on pT peripheral tumor size:
+2. Difference in risk of death based on cT Central Lung SCC size of Tumor: 
+```{r}
+summary(glm(death ~ cT, data = lungSCC, family = "binomial"))
+```
+
+```{r}
+exp(0.5702)
+exp(1.4731)
+exp(1.3122)
+```
+Interpretations: 
+1. All the tumor size have positive association with the risk of death
+2. Tumor size T2 has 76% more chances of death as compaed to T1
+3. Tumor size T3 has 336% more chances of death as compaed to T1
+4. Tumor size T4 has 271% more chances of death as compaed to T1
+5. Patient with Central SSC tumor size of T3 has the highest risk of death 
+
+
+3. Difference in risk of death based on cN when nearby lymph nodes are involved:
+```{r}
+summary(glm(death ~ cN, data = lungSCC, family = "binomial"))
+```
+
+```{r}
+exp(0.5702)
+exp(1.4731)
+exp(1.3122)
+```
+Interpretations: 
+1.All the tumor size have positive association with the risk of death
+2. Proximity of N1 lymph nodes has 76% more chances of death as compared to N0
+3. Proximity of N2 lymph nodes has 336% more chances of death as compared to N0
+4. Proximity of N3 lymph nodes has 271% more chances of death as compared to N0
+5. Patient with Proximity of N2 lymph nodes has the highest risk of death 
+
+
+4. Difference in risk of death based on cM when distant metastasis (spread of cancer from one part of the body to another) are involved: 
+```{r}
+summary(glm(death ~ cM, data = lungSCC, family = "binomial"))
+```
+
+```{r}
+exp(0.2744)
+```
+Interpretations:
+1.All Distant metastasis  have positive association with the risk of death
+2.M3 Distant metastasis  has 31 % higher chances of risk of death as compared to M1 
+
+
+5. Difference in risk of death based on pT Peripheral Lung SCC size of Tumor:
 ```{r}
 with(lungSCC, table(death, pT))
 
@@ -443,7 +496,7 @@ Interpretation:
 3. The risk of death of patients who have a tumor of pT4 size type is 255% higher than for patients whose tumor has pT1 size type.
 
 
-X. Difference in risk of death based on pN peripheral tumor size:
+6. Difference in risk of death based on pN when nearby lymph nodes are involved:
 ```{r}
 with(lungSCC, table(death, pN))
 
@@ -466,7 +519,7 @@ Interpretation:
 3. The risk of death of patients who have a tumor of pN3 size type is 393% higher than for patients whose tumor has pN0 size type.
 
 
-X. Difference in risk of death based on pM peripheral tumor size:
+4. Difference in risk of death based on pM when distant metastasis (spread of cancer from one part of the body to another) are involved:
 ```{r}
 with(lungSCC, table(death, pM))
 
@@ -483,7 +536,16 @@ exp(15.8626)
 ```
 
 
-X. Difference in risk of death based on FEV1_FVC pulmonary function test:
+8. Difference in risk of death based on the smoking state:
+```{r}
+summary(glm(death ~ Smoking_state, data = lungSCC, family = "binomial"))
+```
+Interpretation : 
+1.Being a current smoker , ex smoker and non smoker has negative association with death .
+2.No significant relation between Smoking State and death
+
+
+9. Difference in risk of death based on FEV1_FVC pulmonary function test:
 ```{r}
 with(lungSCC, table(death, FEV1_FVC))
 
@@ -501,7 +563,7 @@ exp(0.011147)
 ```
 
 
-X. Difference in risk of death based on CEA serum:
+10. Difference in risk of death based on CEA serum:
 ```{r}
 with(lungSCC, table(death, CEA))
 
@@ -518,7 +580,8 @@ Interpretation:
 exp(-0.003081)
 ```
 
-Difference in risk of death based on Operation undergone : 
+
+11. Difference in risk of death based on the type of operation undergone:
 ```{r}
 summary(glm(death ~ OP, data = lungSCC, family = "binomial"))
 
@@ -532,80 +595,6 @@ Interpretation :
 1.We can see that No operation ,pneumonectomy and PLN biopsy has postive effect on death while segmentectomy has negative effect 
 2.LN biopsy has significant relation with the prediction of death with p-value : 0.006946
 3. The odds ratio states that person who has undergone  LN biopsyhas 714% chances of death as compared to person undergone lobectomy 
-
-
-
-Difference in risk of death based on smoking state : 
-```{r}
-summary(glm(death ~ Smoking_state, data = lungSCC, family = "binomial"))
-
-
-```
-Interpretation : 
-1.Being a current smoker , ex smoker and non smoker has negative association with death .
-2.No significant relation between Smoking State and death
-
-Difference in risk of death based on Central Lung SCC size of Tumor : 
-```{r}
-summary(glm(death ~ cT, data = lungSCC, family = "binomial"))
-
-```
-
-```{r}
-exp(0.5702)
-
-exp(1.4731)
-
-exp(1.3122)
-```
-Interpretations: 
-1. All the tumor size have positive association with the risk of death
-2. Tumor size T2 has 76% more chances of death as compaed to T1
-3. Tumor size T3 has 336% more chances of death as compaed to T1
-4. Tumor size T4 has 271% more chances of death as compaed to T1
-5. Patient with Central SSC tumor size of T3 has the highest risk of death 
-
-
-
-Difference in risk of death when Nearby lymph nodes that are involved : 
-```{r}
-summary(glm(death ~ cN, data = lungSCC, family = "binomial"))
-
-```
-
-
-```{r}
-exp(0.5702)
-
-exp(1.4731)
-
-exp(1.3122)
-
-```
-
-
-Interpretations: 
-1.All the tumor size have positive association with the risk of death
-2. Proximity of N1 lymph nodes has 76% more chances of death as compared to N0
-3. Proximity of N2 lymph nodes has 336% more chances of death as compared to N0
-4. Proximity of N3 lymph nodes has 271% more chances of death as compared to N0
-5. Patient with Proximity of N2 lymph nodes has the highest risk of death 
-
-
-
-Difference in risk of death when Distant metastasis (spread of cancer from one part of the body to another) are involved : 
-```{r}
-summary(glm(death ~ cM, data = lungSCC, family = "binomial"))
-
-
-```
-
-```{r}
-exp(0.2744)
-```
-Interpretations:
-1.All Distant metastasis  have positive association with the risk of death
-2.M3 Distant metastasis  has 31 % higher chances of risk of death as compared to M1 
 
 
 *# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
@@ -677,24 +666,30 @@ Interpretation:
 ## Relationship between clinicopathologic features and survival time (OS)
 
 ----
-X. patient with and without observed metastasis after surgery (meta)
-X. lymph node ratio
-X. pT peripheral tumor size
-X. pN peripheral tumor size
-X. pM peripheral tumor size
-X. FEV1_FVC pulmonary function test
-X. CEA serum
+1. Sex
+2. Age
+3. lymph node ratio
+4. cT Central Lung SCC size of Tumor
+5. cN when nearby lymph nodes are involved
+6. cM when distant metastasis are involved
+7. pT Peripheral Lung SCC size of Tumor
+8. pN when nearby lymph nodes are involved
+9. pM when distant metastasis are involved
+10. smoking state
+11. FEV1_FVC pulmonary function test
+12. CEA serum
+13. the type of operation undergone
+14. patient with and without observed metastasis after surgery (meta)
 ----
 
-X. patient with and without observed metastasis after surgery (meta)
-```{r}
-fit_meta <- coxph(Surv(OS, death)~meta, data=lungSCC)
-summary(fit_meta)
-```
-Interpretation:
-With a very low p-value of 5.22e-08 and a positive coefficient of 0.85, we can assume that there is a highly significant positive relationship between survival time and the observation of metastasis after surgery.
 
-X. lymph node ratio
+1. Sex:
+
+
+2. Age:
+
+
+3. lymph node ratio:
 ```{r}
 fit_LNratio <- coxph(Surv(OS, death)~LN_ratio, data=lungSCC)
 summary(fit_LNratio)
@@ -702,7 +697,17 @@ summary(fit_LNratio)
 Interpretation:
 With a positive coefficient of 0.84 and low p-value of 0.009, we can assume that there is a significant positive relationship between survival time and the lymph node ratio.
 
-X. pT peripheral tumor size
+
+4. cT Central Lung SCC size of Tumor:
+
+
+5. cN when nearby lymph nodes are involved:
+
+
+6. cM when distant metastasis are involved:
+
+
+7. pT Peripheral Lung SCC size of Tumor:
 ```{r}
 fit_pT <- coxph(Surv(OS, death)~pT, data=lungSCC)
 summary(fit_pT)
@@ -710,7 +715,8 @@ summary(fit_pT)
 Interpretation:
 With a positive coefficient of 1.99 and low p-value of 0.008, we can assume that there is a significant positive relationship between survival time and the pT3 tumor size.
 
-X. pN peripheral tumor size
+
+8. pN when nearby lymph nodes are involved
 ```{r}
 fit_pN <- coxph(Surv(OS, death)~pN, data=lungSCC)
 summary(fit_pN)
@@ -718,7 +724,8 @@ summary(fit_pN)
 Interpretation:
 With a positive coefficient of 0.86 and very low p-value of 1.51e-05, we can assume that there is a highly significant positive relationship between survival time and the pN2 tumor size.
 
-X. pM peripheral tumor size
+
+9. pM when distant metastasis are involved
 ```{r}
 fit_pM <- coxph(Surv(OS, death)~pM, data=lungSCC)
 summary(fit_pM)
@@ -726,7 +733,11 @@ summary(fit_pM)
 Interpretation: #CAREFUL WITH THIS ONE
 With a positive coefficient of 1.77 and very low p-value of 0.0005, we can assume that there is a highly significant positive relationship between survival time and the pM1b tumor size.
 
-X. FEV1_FVC pulmonary function test
+
+10. smoking state:
+
+
+11. FEV1_FVC pulmonary function test
 ```{r}
 fit_FEV1FVC <- coxph(Surv(OS, death)~FEV1_FVC, data=lungSCC)
 summary(fit_FEV1FVC)
@@ -734,7 +745,8 @@ summary(fit_FEV1FVC)
 Interpretation:
 With a p-value of 0.13 we can assume that there is no significant relationship between survival time and the FEV1_FVC pulmonary function test.
 
-X. CEA serum
+
+12. CEA serum
 ```{r}
 fit_CEA <- coxph(Surv(OS, death)~CEA, data=lungSCC)
 summary(fit_CEA)
@@ -743,8 +755,26 @@ Interpretation:
 With a p-value of 0.60 we can assume that there is no significant relationship between survival time and the CEA serum.
 
 
+13. the type of operation undergone:
+
+
+14. patient with and without observed metastasis after surgery (meta)
+```{r}
+fit_meta <- coxph(Surv(OS, death)~meta, data=lungSCC)
+summary(fit_meta)
+```
+Interpretation:
+With a very low p-value of 5.22e-08 and a positive coefficient of 0.85, we can assume that there is a highly significant positive relationship between survival time and the observation of metastasis after surgery.
+
+
 *# Part 3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
 (Only when n of each gr kind of similar)
+
+List of features which have a significant relationship with survival time (OS):
+- 
+- 
+- 
+
 
 ## Comparison between 2 groups of patients based on observed metastasis after surgery
 
