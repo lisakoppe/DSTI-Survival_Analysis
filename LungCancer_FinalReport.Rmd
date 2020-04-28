@@ -234,10 +234,6 @@ Hypotheses:
 H0: there is no relationship between the two categorical variables.
 H1: the variables are dependent. Knowing the value of one variable helps to predict the value of the other variable.
 
-Odds ratio:
-Odds for death in patient with specific condition
-divided by odds for death in patient without specific condition
-If those 2 sets of patient have equal odds (odds ratio = 1), that specific condition are independent to death status
 
 ----
 1. Difference in risk of death in patient with and without obstructive pneumonitis/ atelectais
@@ -270,6 +266,15 @@ Patients with lung effusion have 5% higher risk of death than patients without l
 
 Determine the relationship between categorical continuous variables
 
+Hypotheses:
+H0: there is no different in odds between that specific group and reference group 
+H1: Odds of that specific group and reference group is statistically significant
+
+Interpretation:
+Estimate of interception = The log odds when the specific condition equal 0
+Estimate of each variable = The increase/decrese in the log odds when compare to reference group
+To define the odds ratio, exponent estimate value.
+
 ----
 1. Difference in risk of death based on cancer location
 2. Difference in risk of death based on cell necrosis
@@ -283,9 +288,9 @@ fit <- glm(death~Location, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer. To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
+The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer, however; this different is not significant.
 
+To see the odds ratio between these 2 conditions, we have to exponent this coefficients
 
 ```{r}
 exp(0.2749)
@@ -309,12 +314,9 @@ fit <- glm(death~Necrosis, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. No remakable cell necrosis shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
-2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
+1. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
+2. The different in odds between no remarkable necrosis and lung cavitization is statistically significant with p-value 0.0248
 
-BE CAREFUL!
-Have to check if + and - sign in front of estimate is the higher/lower odds when compare to reference class only (Interpretation 2 is kind of sure but better to be rechecked)
-Or we can say that it also shows + and - relaitonship with death as we mention in Interpretation 1
 
 
 ```{r}
@@ -324,6 +326,16 @@ exp(-0.9776)
 Interpretation:
 Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  62% lower than patients with cavitization.
 
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Necrosis, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+95% interval shows that the risk of death of patients without lung cavitization range from 80% lower to around 10% higher than risk of death of lung cancer patients with lung cavitization
+
+HAVE TO RECHECK!!
+The way to interprete 95% interval when we have more than 2 groups
+
 
 3. Difference in risk of death based on underlying lung disease:
 ```{r}
@@ -331,16 +343,24 @@ fit <- glm(death~Underlying_lung, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.007.
-2. No underlying lung disease has statistically significant negative relationship with the risk of death with p-value 0.09
-2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema.
+1. Interstitial lung abnormalities (ILA) shows significantly higher risk
+of death than emphysema with p-value 0.007.
+2. No underlying lung disease has statistically significant lower risk than emphysema with p-value 0.04.
 
 ```{r}
-exp(1.81475)
-exp(-0.45911)
+exp(1.76823)
+exp(-0.51250)
 ```
 Interpretation:
 Risk of death of lung cancer patients with ILA is almost 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
+
+
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Underlying_lung, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+Patients without emphyma shows higher risk of death than those with emphyma around 0.8 to 26 times
 
 
 ## Relationship between clinicopathologic features and death
@@ -607,6 +627,12 @@ Interpretation :
 
 *# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
 
+# Check censoring coding
++ = Patient survive (at least until that time point of the study)
+```{r}
+with(lungSCC, Surv(OS, death))
+```
+
 ### Kaplan-Meier estimator
 
 Overall survival estimation:
@@ -617,6 +643,7 @@ fit.KM
 Interpretation:
 From total 398 patients, 172  (43%) were death
 Half of lung cancer patient will death within 103 months
+(We don't have upper bound because some patients survive until the end of study)
 RECHECK HOW TO INTERPREAT MEDIAN and KM plot WITH CENSORING DATA
 
 ```{r}
@@ -721,10 +748,20 @@ No underlying lung disease also has a statistically significant negative relatio
 
 
 1. Sex:
-
+```{r}
+fit_Sex <- coxph(Surv(OS, death)~Sex, data=lungSCC)
+summary(fit_Sex)
+```
+Interpretation:
+With a negative coef of -0.2719 and p-value close to 0.05 , we can conclude that Sex doesnt have major impact on the survival .
 
 2. Age:
-
+```{r}
+fit_Age <- coxph(Surv(OS, death)~AG, data=lungSCC)
+summary(fit_Age)
+```
+Interpretation : 
+With a positive coef and p-value as low as 0.00103, we can assume that there is a significant positive relationship between survival time and the age.
 
 3. lymph node ratio:
 ```{r}
@@ -748,11 +785,31 @@ With a positive coefficient of 0.84 and low p-value of 0.009, we can assume that
 
 4. cT Central Lung SCC size of Tumor:
 
+```{r}
+fit_cT <- coxph(Surv(OS, death)~cT, data=lungSCC)
+summary(fit_cT)
+```
+
+Interpretation:
+With a positive coefficient of 1.14 and low p-value of 2.99e-05, we can assume that there is a significant positive relationship between survival time and the CT3 tumor size.
+
 
 5. cN when nearby lymph nodes are involved:
-
+```{r}
+fit_cN <- coxph(Surv(OS, death)~cN, data=lungSCC)
+summary(fit_cN)
+```
+Interpretation:
+With a positive coefficient of 2.1621 and low p-value of  0.000321 , we can assume that there is a significant positive relationship between survival time and the cN3 near by nymph nodes.
 
 6. cM when distant metastasis are involved:
+
+```{r}
+fit_cM <- coxph(Surv(OS, death)~cM, data=lungSCC)
+summary(fit_cM)
+```
+Interpretation:
+With a positive coefficient of 2.1621 and high p-value of  0.667 , we can assume that there is a no significant  relationship between survival time and the cM distant metasis
 
 
 7. pT Peripheral Lung SCC size of Tumor:
@@ -786,7 +843,13 @@ With a positive coefficient of 1.77 and very low p-value of 0.0005, we can assum
 
 
 10. smoking state:
+```{r}
+fit_Smoking_state <- coxph(Surv(OS, death)~Smoking_state, data=lungSCC)
+summary(fit_Smoking_state)
+```
 
+Interpretation: 
+With all the p-value being greater than 0.05, we can conclude that smoking state has no effect on the survival .
 
 11. FEV1_FVC pulmonary function test
 ```{r}
@@ -809,6 +872,14 @@ With a p-value of 0.6 we can assume that there is no significant relationship be
 
 
 13. the type of operation undergone:
+```{r}
+fit_op_type <- coxph(Surv(OS, death)~op_type, data=lungSCC)
+summary(fit_op_type)
+
+```
+Interpretation:
+With a very low p-value of 2.17e-06  and a positive coefficient of 1.5034, we can assume that there is a highly significant positive relationship between survival time and the segmentectomy surgery.
+
 
 
 14. patient with and without observed metastasis after surgery (meta)

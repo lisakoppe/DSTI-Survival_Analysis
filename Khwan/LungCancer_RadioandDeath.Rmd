@@ -9,8 +9,8 @@ Paper:
 [Integrated evaluation of clinical, pathological and radiological prognostic factors in squamous cell carcinoma of the lung ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6777828/)
 
 Radiologic Features:
-1. Location
-   = Tumor location
+1. Location 
+   = Tumor location 
    (Class: 0 = Invisible, 1 = Central SCC, 2 = Peripheral SCC)
 2. Obst_pn_or_plugging
    = Present of obstructive pneumonitis/ atelectais
@@ -19,10 +19,10 @@ Radiologic Features:
    (Class: 0 = Nothing, 1 = Necrosis, 2 = Cavitization)
 4. Underlying_lung
    = Underlying lung disease
-   (Class: 0 = No Remarkable, 1 = Emphysema, 2 = Interstitial lung abnormality)
+   (Class: 0 = No Remark, 1 = Interstitial lung abnormality, 2 = Emphysema)
 5. Effusion
    (Logical: 0 = Absent, 1 = Present)
-6.  Death
+6.  Death 
     (Logical: Not Death = 0, Death = 1)
 7.  OS(M)
 
@@ -41,7 +41,7 @@ lungSCC_raw<- read_csv("LungCancer.csv",
 
 ```
 
-# Data Preparation: Check null value and data classification
+# Data Preparation: Check null value and data classification 
 Use table for classification and Logical column to see how they distribute
 Count null value in decimal column (OS)
 
@@ -58,13 +58,13 @@ sum(is.na(lungSCC_raw$death))
 # Data Preparation: Define the meaning of each label to make it easier for interpretation
 
 ```{r}
-lungSCC <- mutate(lungSCC_raw,
-
+lungSCC <- mutate(lungSCC_raw, 
+               
                Location = ifelse(Location == 0, "Peripheral", "Central"),
-
+               
                Necrosis = ifelse(Necrosis == 0, "NoRemark",
                           ifelse(Necrosis == 1, "Necrosis", "Cavitization")),
-
+               
                Underlying_lung = ifelse(Underlying_lung == 0, "NoRemark",
                                  ifelse(Underlying_lung == 1, "Emphysema", "ILA")))
 ```
@@ -82,7 +82,7 @@ Determine the relationship between two categorical variables
 
 Hypotheses:
 H0: There is no relationship between the two categorical variables
-H1 : The variables are dependent. Knowing the value of one variable helps to predict the value of the other variable
+H1 : The variables are dependent. Knowing the value of one variable helps to predict the value of the other variable 
 
 Odds ratio:
 Odds for death in patient with specific condition
@@ -95,12 +95,12 @@ Here we want to define
 2. Diffence in risk of death in patient with and without lung effusion
 
 
-Diffence in risk of death in patient with and without obstructive pneumonitis/ atelectais
+Diffence in risk of death in patient with and without obstructive pneumonitis/ atelectais 
 ```{r}
 with(lungSCC, fisher.test(table(death, Obst_pn_or_plugging)))
 ```
 Interpretation:
-p-value is higher than the significance level of 5%, therefore; we cannot reject null hypothesis which means data not sufficinet to prove that obstructive pneumonitis/ atelectais effect the death.
+p-value is higher than the significance level of 5%, therefore; we cannot reject null hypothesis which means data not sufficinet to prove that obstructive pneumonitis/ atelectais effect the death. 
 
 Odds ratio suggests that patients with obstructive pneumonitis/ atelectais have approximately 19% lower risk of death than that of patient without obstructive pneumonitis/ atelectais
 See that 95% confidence interval ranges from 0.54, where patients with pneumonitis/atelectais have around 5% lower risk of death than patients without this condition, to 1.24 which means they have 24% higher risk of death than another group of patient.
@@ -119,9 +119,9 @@ Patients with lung effusion have 5% higher risk of death than patients without l
 
 
 Trial: Chi-square test just to check if the results are similar to Fisher
-Hypothesis:
-When sample size is big like in this case, p-value of Chi-square and Fisher should be very close to each other
-Result:
+Hypothesis: 
+When sample size is big like in this case, p-value of Chi-square and Fisher should be very close to each other 
+Result: 
 Hypothesis is correct
 Note that there is warning in death and obst that chi-squared may be in correct
 ```{r}
@@ -143,7 +143,6 @@ with(lungSCC, chisq.test(table(death, Effusion)))
 3. Diffence in risk of death based on underlying lung disease
 
 
-
 1. Diffence in risk of death based on cancer location
 
 ```{r}
@@ -154,18 +153,23 @@ summary(fit)
 ```
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The positive value of estimate coefficient indicates the positive relationship between peripheral lung cancer and risk of death.
-3. Odds of peripheral lung cancer is lower than odds of central lung cancer.
-To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
-
+2. The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer. To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
 
 
 ```{r}
 exp(0.2749)
 ```
 Interpretation:
-Risk of death of patients who have invisible lung cancer is around 30% lower than patients with central lung cancer, while risk of death of peripheral lung cancer patients is around 30% higher than that of central lung cancer patients.
+Risk of death of patients who have peripheral lung cancer is around 30% higher than patients with central lung cancer.
 
+
+
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Location, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+Difference in risk of death between 2 type of lung cancer shows huge 95% interval starts from where patients with central lung cancer have around 10% lower to two times higher risk of death than that of peripheral lung cancer patients.
 
 
 
@@ -177,7 +181,7 @@ summary(fit)
 
 ```
 Interpretation:
-1. No cell necrosis observation shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
+1. No remarkable cell necrosis shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
 2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
 
 ```{r}
@@ -185,7 +189,16 @@ exp(-0.7482)
 exp(-0.9776)
 ```
 Interpretation:
-Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  63% lower than patients with cavitization.
+Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  62% lower than patients with cavitization.
+
+
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Necrosis, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+95% interval shows that the risk of death of patients with lung necrosis range from 80% lower to around 10% higher than risk of death of lung cancer patients without necrosis
+
 
 
 3. Diffence in risk of death based on underlying lung disease
@@ -198,7 +211,7 @@ summary(fit)
 ```
 Interpretation:
 1. Interstitial lung abnormalities (ILA) shows significantly positive relationship with the risk of death with p-value 0.007.
-2. No underlying lung disease has statistically significant negative relationship with the risk of death with p-value 0.09
+2. No underlying lung disease has statistically significant negative relationship with the risk of death with p-value 0.04
 2. Odd of ILA is higher than that of emphysema while odd of negative underlying lung disease is lower than odd of patients with emphysema.
 
 
@@ -210,7 +223,13 @@ Interpretation:
 Risk of death of lung cancer patients with ILA is almost 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
 
 
-have necrosis and invisible cell necrosis are around 53% and  63% lower than patients with cavitization.
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Underlying_lung, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+Patients with emphyma shows higher risk of death than those without emphyma around 0.8 to 26 times
 
 
-*Part 2: Test relationship between radiologic feature and survival time*
+
+
