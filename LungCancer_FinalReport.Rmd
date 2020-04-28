@@ -310,6 +310,11 @@ Interpretation:
 1. No remakable cell necrosis shows significantly negative effect in the prediction of death in lung cancer patients with p-value 0.0248 (i.e No necrosis reduces risk of death).
 2. Odds of cell necrosis and invisible cell necrosis are lower than that of cavitization in lung
 
+BE CAREFUL!
+Have to check if + and - sign in front of estimate is the higher/lower odds when compare to reference class only (Interpretation 2 is kind of sure but better to be rechecked)
+Or we can say that it also shows + and - relaitonship with death as we mention in Interpretation 1
+
+
 ```{r}
 exp(-0.7482)
 exp(-0.9776)
