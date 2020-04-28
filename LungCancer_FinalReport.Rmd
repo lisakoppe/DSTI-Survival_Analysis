@@ -949,8 +949,10 @@ List of features which have a significant relationship with survival time (OS):
 fit.KM_under <- survfit(Surv(OS, death)~Underlying_lung, data=lungSCC)
 fit.KM_under
 ```
-Interpretation
-
+Interpretation:
+1. Among total 85 patients with emphysema, 43 of them died with 40% chance of death at 82 months.
+2. Among total 21 patients with ILA, 18 of them died with 5% chance of death at 21.5 months.
+3. Among total 292 patients without underlying lung disease, 111 of them died.
 
 We plot the Kaplan-Meier survival curve:
 ```{r}
@@ -968,6 +970,7 @@ The logrank test:
 survdiff(Surv(OS, death)~Underlying_lung, data=lungSCC)
 ```
 Interpretation:
+Logrank test result shows a significant difference in survival between these groups of patients (p=4e-11).
 
 
 ## Comparison between 2 groups of patients based on Peripheral Lung SCC size of Tumor
@@ -976,8 +979,11 @@ Interpretation:
 fit.KM_pT <- survfit(Surv(OS, death)~pT, data=lungSCC)
 fit.KM_pT
 ```
-Interpretation
-
+Interpretation:
+1. Among total 72 patients with pT1 Peripheral Lung SCC size of Tumor, 23 of them died.
+2. Among total 240 patients with pT2 Peripheral Lung SCC size of Tumor, 101 of them died with 82% chance of death at 103.3 months.
+3. Among total 78 patients with pT3 Peripheral Lung SCC size of Tumor, 43 of them died with 37% chance of death at 47.4 months.
+4. Among total 8 patients with pT4 Peripheral Lung SCC size of Tumor, 5 of them died with 30% chance of death at 74.9 months.
 
 We plot the Kaplan-Meier survival curve:
 ```{r}
@@ -995,6 +1001,7 @@ The logrank test:
 survdiff(Surv(OS, death)~pT, data=lungSCC)
 ```
 Interpretation:
+Logrank test result doesn't show a significant difference in survival between these groups of patients (p=0.04).
 
 
 ## Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved
@@ -1003,8 +1010,11 @@ Interpretation:
 fit.KM_pN <- survfit(Surv(OS, death)~pN, data=lungSCC)
 fit.KM_pN
 ```
-Interpretation
-
+Interpretation:
+1. Among total 246 patients with pN0 when nearby lymph nodes are involved, 93 of them died.
+2. Among total 95 patients with pN1 when nearby lymph nodes are involved, 41 of them died.
+3. Among total 53 patients with pN2 when nearby lymph nodes are involved, 35 of them died with 30% chance of death at 37.5 months.
+4. Among total 4 patients with pN3 when nearby lymph nodes are involved, 3 of them died with 16% chance of death at 24.2 months.
 
 We plot the Kaplan-Meier survival curve:
 ```{r}
@@ -1021,6 +1031,7 @@ The logrank test:
 survdiff(Surv(OS, death)~pN, data=lungSCC)
 ```
 Interpretation:
+Logrank test result shows a significant difference in survival between these groups of patients (p=5e-05).
 
 
 ## Comparison between 2 groups of patients based on pM when distant metastasis are involved
@@ -1029,8 +1040,9 @@ Interpretation:
 fit.KM_pM <- survfit(Surv(OS, death)~pM, data=lungSCC)
 fit.KM_pM
 ```
-Interpretation
-
+Interpretation:
+1. Among total 394 patients with pM0 when distant metastasis are involved, 168 of them died with 84% chance of death at 103.3 months.
+2. Among total 4 patients with pM1b when distant metastasis are involved, all of them died with 3% chance of death at 5.35 months.
 
 We plot the Kaplan-Meier survival curve:
 ```{r}
@@ -1048,6 +1060,7 @@ The logrank test:
 survdiff(Surv(OS, death)~pM, data=lungSCC)
 ```
 Interpretation:
+Logrank test result shows a significant difference in survival between these groups of patients (p=8e-05).
 
 
 ## Comparison between 2 groups of patients based on observed metastasis after surgery
@@ -1056,8 +1069,9 @@ Interpretation:
 fit.KM_meta <- survfit(Surv(OS, death)~meta, data=lungSCC)
 fit.KM_meta
 ```
-Interpretation
-
+Interpretation:
+1. Among total 238 patients without observed metastasis, 73 of them died.
+2. Among total 160 patients with observed metastasis, 99 of them died with 38% chance of death at 44.7 months.
 
 We plot the Kaplan-Meier survival curve:
 ```{r}
@@ -1075,7 +1089,7 @@ The logrank test:
 survdiff(Surv(OS, death)~meta, data=lungSCC)
 ```
 Interpretation:
-
+Logrank test result shows a significant difference in survival between these groups of patients (p=2e-08).
 
 
 
