@@ -625,6 +625,68 @@ Interpretation :
 3. The odds ratio states that person who has undergone  LN biopsyhas 714% chances of death as compared to person undergone lobectomy
 
 
+# Multivariate logistic regression
+Start with the full model with all variables
+```{r}
+lungSCC_fullmodel_Lo <- glm(death ~ Location + Obst_pn_or_plugging + Necrosis + Underlying_lung + Effusion + Sex + AG + LN_ratio + cT+ cN + cM + pT+ pN+ pM + Smoking_state + FEV1_FVC + CEA + meta , data = lungSCC)
+```
+
+
+Automatic model selection based on AIC
+```{r}
+lungSCC_multiLo <- step(lungSCC_fullmodel_Death)
+````
+Interpretation:
+After backward selection, we found that the best model to predict death status composes of 9 variables with the converted AIC 483.13 from the original AIC 502.76
+
+```{r}
+summary(lungSCC_multiLo)
+confint(lungSCC_multiLo)  # 95% CI
+```
+
+Define odds ratio of each variable with significant p-value
+```{r}
+exp(0.367529)
+exp(0.157739)
+exp(0.181661)
+
+exp(0.329022)
+exp(0.323513)
+exp(0.270530)
+
+exp(-0.134789)
+exp(-0.249240)
+exp(0.300623)
+
+```
+
+Interpretation:
+1. Underlying lung disease: 
+   Patients who have ILA has 40% higher risk of death than patients with emphysema
+
+2. Age: 
+   Patients that older than 60 years old have approximately 17% higher risk than patients that younger than 60 years old of every 1 year older
+   
+3. Size of tumor in central lung cancer patients (cT):
+   Patients in criteria T2 (Tumor diameter 2.1-4 cm) have 20% higher risk than patient with criteria T1 while this higher risk is about 40% in patient with T3 and T4
+   
+   
+5. Nearby lymph nodes that are involved in peripheral lung cancer patients (pN);
+   Peripheral lung cancer patients whom their cancers spread to lymph nodes in the centre of the chest or under the windpipe brances off to each lung (N2) have approximately 30% higher risk than patients who show no nodal involvement.
+
+6. Smoking history:
+   Patients who used to smoke and non smoker have 10% and 20% lower risk than patients who have unknown record about smoking
+IMPORTATN! SHOULD CHANGE THE REF GROUP FROM UNKNOWN TO SMOKER (also in multivariate cox) 
+
+
+7. Metastasis 
+   For both type of lung cancer, patients who have cancer spreading outside the lung have approximately 30% higher risk than those without metastasis
+
+
+
+
+
+
 *# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
 
 # Check censoring coding
@@ -731,6 +793,7 @@ The summary output also gives upper and lower 95% confidence intervals for the h
 With a very low p-value of 1.95e-05 and a positive coefficient of 1.21, we can assume that there is a highly significant positive relationship between survival time and Interstitial lung abnormalities (ILA).
 No underlying lung disease also has a statistically significant negative relationship with the survival time with a p-value of 0.02.
 *We then select this covariate as significant for the upcoming study.*
+
 
 
 ## Relationship between clinicopathologic features and survival time (OS)
@@ -1206,7 +1269,8 @@ ggsurvplot(fit.KM_Age,
            ylab = "Survival probability")
 ```
 
-Multivariates Cox Regression
+
+## Multivariates Cox Regression
 Start with the full model with all variables
 ```{r}
 
@@ -1272,7 +1336,7 @@ The concordance score of this model is less than the previous one which means th
 Since lungSCC_multiCox_2 is the nested model of lungSCC_multiCox, to compare both model we will use Likelihood Ratio Test (LRT)
 
 
-Compaing nested model: LRT
+Comparing nested model: LRT
 ```{r}
 anova(lungSCC_multiCox_2, lungSCC_multiCox)
 ```
