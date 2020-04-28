@@ -1277,5 +1277,8 @@ Compaing nested model: LRT
 anova(lungSCC_multiCox_2, lungSCC_multiCox)
 ```
 Interpretation:
-Non significant p-value indicates that there is no significant different in the goodness of fit between these 2 models.
-Even lungSCC_multiCox model is more complex than lungSCC_multiCox_2 but it has higher concordance score, therefore; we will go for this one.
+Partial likelihood of model 2 (-895.68) is higher than model one (-925.63)
+and this difference in goodness of fit is statistically significant with p-value 9.676e-10.
+Similarly with the interpretaion of concordance score, the lungSCC_multiCox is the better model than lungSCC_multiCox_2
+
+
