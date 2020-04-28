@@ -8,24 +8,6 @@ output: word_document
 Paper:
 [Integrated evaluation of clinical, pathological and radiological prognostic factors in squamous cell carcinoma of the lung ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6777828/)
 
-Radiologic Features:
-1. Location
-   = Tumor location
-   (Class: 0 = Invisible, 1 = Central SCC, 2 = Peripheral SCC)
-2. Obst_pn_or_plugging
-   = Present of obstructive pneumonitis/ atelectais
-   (Logical: 0 = Absent, 1 = Present)
-3. Necrosis
-   (Class: 0 = Nothing, 1 = Necrosis, 2 = Cavitization)
-4. Underlying_lung
-   = Underlying lung disease
-   (Class: 0 = No Remarkable, 1 = Emphysema, 2 = Interstitial lung abnormality)
-5. Effusion
-   (Logical: 0 = Absent, 1 = Present)
-6.  Death
-    (Logical: Not Death = 0, Death = 1)
-7.  OS(M)
-
 
 *Survival Curve*
 Objective:
@@ -45,20 +27,27 @@ library(survminer)
 lungSCC_raw<- read_csv("LungCancer.csv",
                      col_types = cols(Location="d", Obst_pn_or_plugging = "d", Necrosis = "d", Underlying_lung = "d", Effusion = "d", death = "d", OS = "d", .default = "c"))
 
-lungSCC <- mutate(lungSCC_raw,
-
+lungSCC <- mutate(lungSCC_raw, 
+               
                Location = ifelse(Location == 0, "Invisible",
                           ifelse(Location == 1, "Central", "Peripheral")),
-
+               
                Necrosis = ifelse(Necrosis == 0, "NoRemark",
                           ifelse(Necrosis == 1, "Necrosis", "Cavitization")),
-
+               
                Underlying_lung = ifelse(Underlying_lung == 0, "NoRemark",
                                  ifelse(Underlying_lung == 1, "Emphysema", "ILA")))
 ```
 
 
-### Kaplan-Meyer estimator
+# Check censoring coding
++ = Patient survive (at least until that time point of the end of the study)
+```{r}
+with(lungSCC, Surv(OS, death))
+```
+
+
+### Kaplan-Meyer estimator 
 
 Overall survival estimation
 
@@ -67,15 +56,16 @@ fit.KM <- survfit(Surv(OS, death) ~ 1, data = lungSCC)
 fit.KM
 ```
 Interpretation:
-From total 398 patients, 172  (43%) were death
+From total 398 patients, 172  (43%) were death 
 Half of lung cancer patient will death within 103 months
-RECHECK HOW TO INTERPREAT MEDIAN and KM plot WITH CENSORING DATA
+(We don't have upper bound because some patients survive until the end of study)
+RECHECK HOW TO INTERPREAT MEDIAN and KM plot WITH CENSORING DATA 
 
 
 ```{r}
 ggsurvplot(fit.KM,
-           legend.title = "Survival",
-           xlab = "Months",
+           legend.title = "Survival", 
+           xlab = "Months",  
            ylab = "Survival probability")
 ```
 
@@ -105,12 +95,16 @@ ggsurvplot(fit.KM_Location,
 
 # The logrank test
 
-H0:
+H0: 
 No difference in survival 2 groups of patients with different cancer locations
 
 ```{r}
-fit.logrank <- survdiff(Surv(OS, death) ~ Location, data = lungSCC)
-fit.logrank
+survdiff(Surv(OS, death) ~ Location, data = lungSCC)
 ```
 Interpretation:
 Logrank test result shows no statistical significant difference in survival between these 2 groups of lung cancer patients
+
+
+
+
+
