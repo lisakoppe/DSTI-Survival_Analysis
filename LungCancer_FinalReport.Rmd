@@ -737,10 +737,20 @@ No underlying lung disease also has a statistically significant negative relatio
 
 
 1. Sex:
-
+```{r}
+fit_Sex <- coxph(Surv(OS, death)~Sex, data=lungSCC)
+summary(fit_Sex)
+```
+Interpretation:
+With a negative coef of -0.2719 and p-value close to 0.05 , we can conclude that Sex doesnt have major impact on the survival .
 
 2. Age:
-
+```{r}
+fit_Age <- coxph(Surv(OS, death)~AG, data=lungSCC)
+summary(fit_Age)
+```
+Interpretation : 
+With a positive coef and p-value as low as 0.00103, we can assume that there is a significant positive relationship between survival time and the age.
 
 3. lymph node ratio:
 ```{r}
@@ -753,11 +763,31 @@ With a positive coefficient of 0.84 and low p-value of 0.009, we can assume that
 
 4. cT Central Lung SCC size of Tumor:
 
+```{r}
+fit_cT <- coxph(Surv(OS, death)~cT, data=lungSCC)
+summary(fit_cT)
+```
+
+Interpretation:
+With a positive coefficient of 1.14 and low p-value of 2.99e-05, we can assume that there is a significant positive relationship between survival time and the CT3 tumor size.
+
 
 5. cN when nearby lymph nodes are involved:
-
+```{r}
+fit_cN <- coxph(Surv(OS, death)~cN, data=lungSCC)
+summary(fit_cN)
+```
+Interpretation:
+With a positive coefficient of 2.1621 and low p-value of  0.000321 , we can assume that there is a significant positive relationship between survival time and the cN3 near by nymph nodes.
 
 6. cM when distant metastasis are involved:
+
+```{r}
+fit_cM <- coxph(Surv(OS, death)~cM, data=lungSCC)
+summary(fit_cM)
+```
+Interpretation:
+With a positive coefficient of 2.1621 and high p-value of  0.667 , we can assume that there is a no significant  relationship between survival time and the cM distant metasis
 
 
 7. pT Peripheral Lung SCC size of Tumor:
@@ -788,7 +818,13 @@ With a positive coefficient of 1.77 and very low p-value of 0.0005, we can assum
 
 
 10. smoking state:
+```{r}
+fit_Smoking_state <- coxph(Surv(OS, death)~Smoking_state, data=lungSCC)
+summary(fit_Smoking_state)
+```
 
+Interpretation: 
+With all the p-value being greater than 0.05, we can conclude that smoking state has no effect on the survival .
 
 11. FEV1_FVC pulmonary function test
 ```{r}
@@ -809,6 +845,14 @@ With a p-value of 0.60 we can assume that there is no significant relationship b
 
 
 13. the type of operation undergone:
+```{r}
+fit_op_type <- coxph(Surv(OS, death)~op_type, data=lungSCC)
+summary(fit_op_type)
+
+```
+Interpretation:
+With a very low p-value of 2.17e-06  and a positive coefficient of 1.5034, we can assume that there is a highly significant positive relationship between survival time and the segmentectomy surgery.
+
 
 
 14. patient with and without observed metastasis after surgery (meta)
