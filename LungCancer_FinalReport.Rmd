@@ -234,10 +234,6 @@ Hypotheses:
 H0: there is no relationship between the two categorical variables.
 H1: the variables are dependent. Knowing the value of one variable helps to predict the value of the other variable.
 
-Odds ratio:
-Odds for death in patient with specific condition
-divided by odds for death in patient without specific condition
-If those 2 sets of patient have equal odds (odds ratio = 1), that specific condition are independent to death status
 
 ----
 1. Difference in risk of death in patient with and without obstructive pneumonitis/ atelectais
@@ -270,6 +266,15 @@ Patients with lung effusion have 5% higher risk of death than patients without l
 
 Determine the relationship between categorical continuous variables
 
+Hypotheses:
+H0: there is no different in odds between that specific group and reference group 
+H1: Odds of that specific group and reference group is statistically significant
+
+Interpretation:
+Estimate of interception = The log odds when the specific condition equal 0
+Estimate of each variable = The increase/decrese in the log odds when compare to reference group
+To define the odds ratio, exponent estimate value.
+
 ----
 1. Difference in risk of death based on cancer location
 2. Difference in risk of death based on cell necrosis
@@ -283,10 +288,9 @@ fit <- glm(death~Location, family="binomial", data=lungSCC)
 summary(fit)
 ```
 Interpretation:
-The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer. 
-However, this different is not significant.
+The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer, however; this different is not significant.
 
-To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
+To see the odds ratio between these 2 conditions, we have to exponent this coefficients
 
 ```{r}
 exp(0.2749)
@@ -633,6 +637,7 @@ fit.KM
 Interpretation:
 From total 398 patients, 172  (43%) were death
 Half of lung cancer patient will death within 103 months
+(We don't have upper bound because some patients survive until the end of study)
 RECHECK HOW TO INTERPREAT MEDIAN and KM plot WITH CENSORING DATA
 
 ```{r}
