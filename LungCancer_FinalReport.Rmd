@@ -1282,3 +1282,12 @@ and this difference in goodness of fit is statistically significant with p-value
 Similarly with the interpretaion of concordance score, the lungSCC_multiCox is the better model than lungSCC_multiCox_2
 
 
+Model diagnostics: Martingale residuals
+```{r}
+dfbetas <- residuals(lungSCC_multiCox, type = 'dfbetas')
+lungSCC$dfbetas <- sqrt(rowSums(dfbetas^2))
+plot(lungSCC$dfbetas, type = 'h')
+abline(h = 0)
+```
+Interpretation:
+No patient with extremely information
