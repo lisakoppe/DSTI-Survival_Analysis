@@ -216,7 +216,7 @@ table(lungSCC$AG)
     (0=Absent, 1=Present)
 
 
-*# Part 1: Test relationship between radiologic/clinicopathologic features and death (not considering survival duration)*
+*Part 1: Test relationship between radiologic/clinicopathologic features and death*
 
 Methods used:
 1. Fisher's exact test (determine the relationship between two categorical variables)
