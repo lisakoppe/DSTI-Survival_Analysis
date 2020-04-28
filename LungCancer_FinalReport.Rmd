@@ -282,15 +282,23 @@ summary(fit)
 ```
 Interpretation:
 1. No significant relationship between location of lung cancer and the prediction of death status.
-2. The positive value of estimate coefficient indicates the positive relationship between peripheral lung cancer and risk of death.
-3. Odds of peripheral lung cancer is lower than odds of central lung cancer. 
-To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
+2. The positive value of estimate coefficient indicates that peripheral lung cancer has higher odds than central lung cancer. To see the odds ratio between these 2 conditions, we have to exponent this coefficients (see belows).
+
 
 ```{r}
 exp(0.2749)
 ```
 Interpretation:
 Risk of death of patients who have peripheral lung cancer is around 30% higher than patients with central lung cancer
+
+
+Define 95% confidence interval (CI) of odds ratio
+```{r}
+exp(confint(glm(death ~ Location, data = lungSCC, family = "binomial"))[2,])
+```
+Interpretation:
+Difference in risk of death between 2 type of lung cancer shows huge 95% interval starts from where patients with peripheral lung cancer have around 10% lower to two times higher risk of death than that of central lung cancer patients.
+
 
 
 2. Difference in risk of death based on cell necrosis:
@@ -307,7 +315,7 @@ exp(-0.7482)
 exp(-0.9776)
 ```
 Interpretation:
-Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  63% lower than patients with cavitization.
+Risk of death of lung cancer patients who have necrosis and invisible cell necrosis are around 53% and  62% lower than patients with cavitization.
 
 
 3. Difference in risk of death based on underlying lung disease:
