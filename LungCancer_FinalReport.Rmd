@@ -89,9 +89,11 @@ summary(lungSCC_raw$OS)
 ```
 
 
-Define the meaning of each label to make it easier for interpretation
+Redefine the meaning of each label to make it easier for interpretation
+
 
 ```{r}
+
 lungSCC <- mutate(lungSCC_raw,
                   Location=ifelse(Location==0, "Peripheral","Central"),
                   
@@ -100,29 +102,27 @@ lungSCC <- mutate(lungSCC_raw,
 
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
                                          ifelse(Underlying_lung==1, "Emphysema", "ILA")),
-                  
-                  Sex=factor(Sex, levels=c("F", "M")),
-                  
-                  AG=ifelse((Age<60), "LT60", "OV60"),
+                  AG = ifelse((Age < 60), "LT60", "OV60"),
           
-                  AG=factor(AG),
+                  AG = factor(AG),
                 
-                  OP=factor(op_type, labels=c("lobectomy", "pneumonectomy", "segmentectomy", "LN biopsy", "No OP")),
-                                                  
-                  Smoking_state=factor(Smoking_state, labels=c("unknown", "current-smoker", "ex- smoker", "non- smoker")),
+                  OP = factor(op_type,labels = c("lobectomy","pneumonectomy","segmentectomy","LN biopsy","No OP")),
+                 
+                  Smoking_state = factor(Smoking_state,labels = c("unknown","current-smoker","ex- smoker", "non- smoker")),
                   
-                  cT=factor(cT, levels=c("1", "2", "3", "4"), labels=c("cT1", "cT2", "cT3", "cT4")),
+                  cT = factor(cT, levels = c("1", "2", "3", "4"), labels = c("cT1", "cT2", "cT3", "cT4")),
                   
-                  cN=factor(cN, levels=c("1", "2", "3", "4"), labels=c("cN0", "cN1", "cN2", "cN3")),
+                  cN = factor(cN, levels = c("1", "2", "3", "4"), labels = c("cN0", "cN1", "cN2", "cN3")),
                   
-                  cM=factor(cM, levels=c("1", "3"), labels=c("cM0", "cM1b")),
+                  cM = factor(cM, levels = c("1", "3"), labels = c("cM0", "cM1b")),
                   
-                  pT=factor(pT, levels=c("1", "2", "3", "4"), labels=c("pT1", "pT2", "pT3", "pT4")),
+                  pT = factor(pT, levels = c("1", "2", "3", "4"), labels = c("pT1", "pT2", "pT3", "pT4")),
                   
-                  pN=factor(pN, levels=c("1", "2", "3", "4"), labels=c("pN0", "pN1", "pN2", "pN3")),
+                  pN = factor(pN, levels = c("1", "2", "3", "4"), labels = c("pN0", "pN1", "pN2", "pN3")),
                   
-                  pM=factor(pM, levels=c("1", "3"), labels=c("pM0", "pM1b")))
+                  pM = factor(pM, levels = c("1", "3"), labels = c("pM0", "pM1b")))
 ```
+
 
 Recheck the distribution of age after regrouped
 ```{r}
