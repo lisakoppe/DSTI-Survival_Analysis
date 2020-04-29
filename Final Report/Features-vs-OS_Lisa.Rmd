@@ -14,6 +14,7 @@ Paper:
 library(tidyverse)
 library(survival)
 library(survminer)
+library(asaur)
 ```
 
 # Data preparation: load the lung cancer dataset and check data types
@@ -94,7 +95,7 @@ lungSCC <- mutate(lungSCC_raw,
                   Location=ifelse(Location==0, "Peripheral","Central"),
 
                   Necrosis=ifelse(Necrosis==0, "NoRemark",
-                                  ifelse(Necrosis==1, "Necrosis", "Cavitization")),
+                                  ifelse(Necrosis==1, "Necrosis", "Cavitation")),
 
                   Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
                                          ifelse(Underlying_lung==1, "Emphysema", "ILA")),
@@ -141,7 +142,7 @@ lungSCC <- mutate(lungSCC_raw,
    (0 = Absent, 1 = Present)
 
 5. Necrosis
-   (0 = No Remark, 1 = Necrosis, 2 = Cavitization)
+   (0 = No Remark, 1 = Necrosis, 2 = Cavitation)
 
 6. Underlying_lung
    = Underlying lung disease
@@ -204,28 +205,7 @@ lungSCC <- mutate(lungSCC_raw,
 21. meta
     = Metastasis observed
     (0=Absent, 1=Present)
-
-______________________________________________________________________________________
-
-*# Part 2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
-
-1. Question asked
-
-2. Methods used
-- Cox Proportional Hazards Model
-- Confidence intervals
-- Kaplan-Meier estimator
-- Logrank test
-
-3. Results (+ include tables and code)
-
-
-
-Compute the Cox model
-Univariate Cox regression analysis
-Multivariate Cox regression analysis
-Visualizing the estimated distribution of survival times
-
+    
 
 # Check censoring coding
 + = Patient survive (at least until that time point of the study)
@@ -253,17 +233,84 @@ ggsurvplot(fit.KM,
            ylab = "Survival probability")
 ```
 
+______________________________________________________________________________________
+
+*# Part2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
+
+1. Question asked
+
+2. Methods used
+- Cox Proportional Hazards Model
+- Confidence intervals
+- Kaplan-Meier estimator
+- Logrank test
+
+3. Results (+ include tables and code)
+
+Univariate Cox regression analysis
+Multivariate Cox regression analysis
+Visualizing the estimated distribution of survival times
+
+
+
+*## Part2.A: Cox Proportional Hazards Regression Model fit*
+
+>> DESCRIBE THE METHODS TO USE
 
 Methods used: Cox Proportional Hazards Model
 
-## Relationship between radiologic features and survival time (OS)
+we use R coxph() 
 
-----
-1. patient with and without obstructive pneumonitis/ atelectais
-2. patient with and without lung effusion
-3. cell necrosis
-4. underlying lung disease
-----
+*## Part2.A.1: Cox Proportional Hazards Regression Model fit including all the studied features*
+
+>> INTRODUCE REGRESSION
+
+```{r}
+lungSCC_fullmodel <- coxph(Surv(OS, death) ~ Location + Obst_pn_or_plugging + Necrosis + Underlying_lung + Effusion + Sex + AG + LN_ratio + cT+ cN + cM + pT+ pN+ pM + Smoking_state + FEV1_FVC + CEA + OP + meta, data=lungSCC)
+
+summary(lungSCC_fullmodel)
+```
+
+According to the outputed coefficients, the statistically significant features we could consider keeping for the next steps of the study are the following (ranked by order of significancy):
+- meta: p-value=0.0000004
+- Underlying_lungILA: p-value=0.0002
+- pM1b: p-value=0.0003
+- Smoking_state, non-smoker: p-value=0.0009
+- cT3: p-value=0.002
+- pN2: p-value=0.003
+- AG OV60: p-value=0.004
+- Underlying_lung, No Remark: p-value=0.008
+
+>> DO WE NEED TO MAKE THE MODEL COMPARISONS?
+
+Let's save the table of results in a csv file:
+```{r}
+broom::tidy(lungSCC_fullmodel) %>%
+   write_csv("coefficients_table.csv")
+```
+
+We will now compute the Cox Proportional Hazards Regression Model fit for each individual variable and their corresponding confidence intervals (CI).
+This step will help us select the significant covariate for the upcoming study.
+
+
+*## Part2.A.2: Cox Proportional Hazards Regression Model fit - Univariate Analysis*
+
+We here split the analysis into two groups of features:
+- Radiologic features
+- Clinicopathologic features
+
+>> DO NOT FORGET TO PUT COX FOR LOCATION SOMEWHERE
+
+*### Part2.A.2.a:Relationship between radiologic features and survival time (OS)*
+
+Features to be analyzed in this part:
+1. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectais
+2. Necrosis vs OS: patients with or without cell necrosis or cavitation observed
+3. Underlying_lung vs OS: the type of underlying lung disease observed
+4. Effusion vs OS: patient with or without observed lung effusion
+
+>> CAREFUL WITH CAVITATION SPELLING EVERYWHERE IN REPORT
+
 
 1. patient with and without obstructive pneumonitis/ atelectais:
 ```{r}
