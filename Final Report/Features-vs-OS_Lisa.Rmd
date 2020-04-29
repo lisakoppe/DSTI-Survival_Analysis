@@ -259,7 +259,27 @@ Visualizing the estimated distribution of survival times
 
 Methods used: Cox Proportional Hazards Model
 
-we use R coxph() 
+we use R coxph():
+
+The Cox regression results can be interpreted as follow:
+
+*1. Statistical significance:*
+The Wald statistic value z, corresponds to the ratio of each regression coefficient to its standard error (z = coef/se(coef)). The wald statistic evaluates, whether the beta (β) coefficient of a given variable is statistically significantly different from 0. 
+
+*2. The regression coefficient:*
+The second feature to note in the Cox model results is the the sign of the regression coefficients (coef). A positive sign means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group.
+
+*3. Hazard ratios (HR):*
+The exponentiated coefficient (exp(coef)) gives the effect size of covariates.
+
+*4. Confidence intervals of the hazard ratios:*
+The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)).
+
+*5. Global statistical significance of the model:*
+Finally, the output gives p-values for three alternative tests for overall significance of the model: The likelihood-ratio test, Wald test, and score logrank statistics. These three methods are asymptotically equivalent. For large enough N, they will give similar results. For small N, they may differ somewhat. The Likelihood ratio test has better behavior for small sample sizes, so it is generally preferred.
+
+Thanks to these results, we can decide to reject or keep covariates for the upcoming study based on their statistical significance.
+
 
 *## Part2.A.1: Cox Proportional Hazards Regression Model fit including all the studied features*
 
@@ -304,532 +324,166 @@ We here split the analysis into two groups of features:
 *### Part2.A.2.a:Relationship between radiologic features and survival time (OS)*
 
 Features to be analyzed in this part:
+
 1. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectais
 2. Necrosis vs OS: patients with or without cell necrosis or cavitation observed
 3. Underlying_lung vs OS: the type of underlying lung disease observed
 4. Effusion vs OS: patient with or without observed lung effusion
 
->> CAREFUL WITH CAVITATION SPELLING EVERYWHERE IN REPORT
+>> CAREFUL WITH "CAVITATION" SPELLING EVERYWHERE IN REPORT
 
-
-1. patient with and without obstructive pneumonitis/ atelectais:
+1. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectais:
 ```{r}
-fit_Obst_pn_or_plugging <- coxph(Surv(OS, death)~Obst_pn_or_plugging, data=lungSCC)
+fit_Obst_pn_or_plugging <- coxph(Surv(OS, death) ~ Obst_pn_or_plugging, data=lungSCC)
 summary(fit_Obst_pn_or_plugging)
 ```
-Interpretation:
-As the p-value is 0.099 , we can conclude that Obstructive pneumonitis/ atelectasis has no significant impact on the survival time .
 
-2. patient with and without lung effusion:
+2. Necrosis vs OS: patients with or without cell necrosis or cavitation observed:
 ```{r}
-fit_effusion <- coxph(Surv(OS, death)~Effusion, data=lungSCC)
-summary(fit_effusion)
-```
-Interpretation:
-CAREFUL, the following interpretation are right according to the numbers but wrong according to the meaning! We might not need them anyway because we reject this covariate!
-Interpretation should be: Patients with lung effusion have 5% higher (an not lower) risk of death than patients without lung effusion.
-
-*1. Statistical significance:*
-The Wald statistic value z, corresponds to the ratio of each regression coefficient to its standard error (z = coef/se(coef)). The wald statistic evaluates, whether the beta (β) coefficient of a given variable is statistically significantly different from 0. Here, we can conclude that the variable effusion doesn't have statistically significant coefficients (z=-0.104, close to 0).
-*2. The regression coefficient:*
-With a value of -0.05, the sign of the regression coefficient is negative which means that the hazard (risk of death) is lower, and thus the prognosis better, for subjects with higher values of that variable. The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group, that is, presence vs absence. The beta coefficient for effusion=-0.05 indicates that patients with lung effusion have lower risk of death (higher survival rates) than patients without lung effusion.
-*3. Hazard ratios (HR):*
-The exponentiated coefficient (exp(coef)=exp(-0.05)=0.95) gives the effect size of covariates. Here, a patient with lung effusion reduces the hazard by a factor of 0.95, or 5%. Having lung effusion is associated with good prognostic.
-*4. Confidence intervals of the hazard ratios:*
-The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)), lower 95% bound=0.3518, upper 95% bound=2.557.
-*5. Global statistical significance of the model:*
-Finally, the output gives p-values for three alternative tests for overall significance of the model: The likelihood-ratio test, Wald test, and score logrank statistics. These three methods are asymptotically equivalent.
-
-*Conclusion:*
-However, with a p-value close to 1 (0.9) we can assume that there is no significant relationship between survival time and lung effusion.
-*We then reject the use of this covariate for the upcoming study.*
-
-
-3. cell necrosis:
-```{r}
-fit_necrosis <- coxph(Surv(OS, death)~Necrosis, data=lungSCC)
+fit_necrosis <- coxph(Surv(OS, death) ~ Necrosis, data=lungSCC)
 summary(fit_necrosis)
-
 ```
-Interpretation:
-With a negative coef -0.5734 and p-value as low as 0.033 we can assume that there is a significant negative relationship between survival time and the no remark in necrosis.
 
-
-4. underlying lung disease:
+3. Underlying_lung vs OS: the type of underlying lung disease observed:
 ```{r}
-fit_UndLung <- coxph(Surv(OS, death)~Underlying_lung, data=lungSCC)
+fit_UndLung <- coxph(Surv(OS, death) ~ Underlying_lung, data=lungSCC)
 summary(fit_UndLung)
 ```
-Interpretation:
-*1. Statistical significance:*
-The Wald statistic value z, corresponds to the ratio of each regression coefficient to its standard error (z = coef/se(coef)). The wald statistic evaluates, whether the beta (β) coefficient of a given variable is statistically significantly different from 0. Here, we can conclude that the variable Underlying_lung has highly statistically significant coefficients (z=4.27 for ILA and z=-2.23 for no remark).
-*2. The regression coefficient:*
-With a value of 1.21, the sign of the regression coefficient for ILA is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable.
-With a value of -0.40, the sign of the regression coefficient for no remark is negative which means that the hazard (risk of death) is lower, and thus the prognosis better, for subjects with higher values of that variable.
-The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group, that is, ILA vs emphysema and no remark vs emphysema. The beta coefficient for ILA=1.21 indicates that patients with ILA have higher risk of death (lower survival rates) than patients with emphysema. The beta coefficient for no remark=-0.40 indicates that patients with no remark have lower risk of death (higher survival rates) than patients with emphysema.
-*3. Hazard ratios (HR):*
-The exponentiated coefficient (exp(coef)=exp(1.21)=3.35 and exp(coef)=exp(-0.40)=0.67) gives the effect size of covariates. Here, a patient with ILA increases the hazard by a factor of 3.35, or 235%. Having ILA is associated with bad prognostic. A patient without ILA nor emphysema decreases the hazard by a factor of 0.67, or 33%. Having neither ILA nor emphysema is associated with good prognostic.
-*4. Confidence intervals of the hazard ratios:*
-The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)):
-- Lower 95% bound=1.9224, upper 95% bound=5.8270 for ILA.
-- Lower 95% bound=0.4706, upper 95% bound=0.9519 for the absence of ILA and emphysema.
 
-*Conclusion:*
-With a very low p-value of 1.95e-05 and a positive coefficient of 1.21, we can assume that there is a highly significant positive relationship between survival time and Interstitial lung abnormalities (ILA).
-No underlying lung disease also has a statistically significant negative relationship with the survival time with a p-value of 0.02.
-*We then select this covariate as significant for the upcoming study.*
-
-
-
-## Relationship between clinicopathologic features and survival time (OS)
-
-----
-1. Sex
-2. Age
-3. lymph node ratio
-4. cT Central Lung SCC size of Tumor
-5. cN when nearby lymph nodes are involved
-6. cM when distant metastasis are involved
-7. pT Peripheral Lung SCC size of Tumor
-8. pN when nearby lymph nodes are involved
-9. pM when distant metastasis are involved
-10. smoking state
-11. FEV1_FVC pulmonary function test
-12. CEA serum
-13. the type of operation undergone
-14. patient with and without observed metastasis after surgery (meta)
-----
-
-
-1. Sex:
+4. Effusion vs OS: patient with or without observed lung effusion:
 ```{r}
-fit_Sex <- coxph(Surv(OS, death)~Sex, data=lungSCC)
+fit_effusion <- coxph(Surv(OS, death) ~ Effusion, data=lungSCC)
+summary(fit_effusion)
+```
+
+The p-values of Obst_pn_or_plugging (0.1), Necrosis (0.05) and effusion (0.9) are too high to consider these features as statistically significant. We then reject the use of these three covariates for the upcoming study.
+
+However, with a very low p-value of *1.95e-05* and a positive coefficient of *1.21*, we can assume that there is a highly significant positive relationship between survival time (OS) and Interstitial lung abnormalities (ILA). With a value of *1.21*, the sign of the regression coefficient for ILA is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for ILA=*1.21* indicates that patients with ILA have higher risk of death (lower survival rates) than patients with emphysema. The exponentiated coefficient (exp(coef)=exp(1.21)=*3.35*) gives the effect size of covariates. Here, a patient with ILA increases the hazard by a factor of *3.35*, or *235%*. Having ILA is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.92*, upper 95% bound=*5.83* for ILA.
+
+*To conclude, we decide to select Underlying_lung as a significant covariate for the upcoming study.*
+
+
+*### Part2.A.2.b:Relationship between clinicopathologic features and survival time (OS)*
+
+Features to be analyzed in this part:
+
+1. Sex vs OS: gender of the patient
+2. AG vs OS: age of the patient at diagnosis
+3. LN_ratio vs OS: lymph node ratio
+4. cT vs OS: central lung SCC size of tumor
+5. cN vs OS: when nearby lymph nodes are involved
+6. cM vs OS: when distant metastasis are involved
+7. pT vs OS: peripheral lung SCC size of tumor
+8. pN vs OS: when nearby lymph nodes are involved
+9. pM vs OS: when distant metastasis are involved
+10. Smoking_state vs OS: current smoking state of the patient
+11. FEV1_FVC vs OS: pulmonary function test
+12. CEA vs OS: serum carcinoembryonic antigen level
+13. OP vs OS: the type of operation undergone by the patient
+14. meta vs OS: patient with and without observed metastasis after surgery
+
+
+1. Sex vs OS: gender of the patient:
+```{r}
+fit_Sex <- coxph(Surv(OS, death) ~ Sex, data=lungSCC)
 summary(fit_Sex)
 ```
-Interpretation:
-With a negative coef of -0.2719 and p-value close to 0.05 , we can conclude that Sex doesnt have major impact on the survival .
 
-2. Age:
+2. AG vs OS: age of the patient at diagnosis:
 ```{r}
-fit_Age <- coxph(Surv(OS, death)~AG, data=lungSCC)
+fit_Age <- coxph(Surv(OS, death) ~ AG, data=lungSCC)
 summary(fit_Age)
 ```
-Interpretation :
-With a positive coef and p-value as low as 0.00103, we can assume that there is a significant positive relationship between survival time and the age.
 
-3. lymph node ratio:
+3. LN_ratio vs OS: lymph node ratio:
 ```{r}
-fit_LNratio <- coxph(Surv(OS, death)~LN_ratio, data=lungSCC)
+fit_LNratio <- coxph(Surv(OS, death) ~ LN_ratio, data=lungSCC)
 summary(fit_LNratio)
 ```
-Interpretation:
-*1. Statistical significance:*
-We can conclude that the variable LN_ratio has a statistically significant coefficient (z=2.59).
-*2. The regression coefficient:*
-With a value of 0.84, the sign of the regression coefficient is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable.
-*3. Hazard ratios (HR):*
-The exponentiated coefficient (exp(coef)=exp(0.84)=2.33) gives the effect size of covariates. Here, a patient with a LN ratio greater than 0 increases the hazard by a factor of 2.33, or 133%. A LN ratio greater than 0 is associated with a bad prognostic.
-*4. Confidence intervals of the hazard ratios:*
-The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)) lower 95% bound=1.229, upper 95% bound=4.414.
 
-*Conclusion:*
-With a positive coefficient of 0.84 and low p-value of 0.009, we can assume that there is a significant positive relationship between survival time and the lymph node ratio.
-*We then select this covariate as significant for the upcoming study.*
-
-
-4. cT Central Lung SCC size of Tumor:
-
+4. cT vs OS: central lung SCC size of tumor:
 ```{r}
-fit_cT <- coxph(Surv(OS, death)~cT, data=lungSCC)
+fit_cT <- coxph(Surv(OS, death) ~ cT, data=lungSCC)
 summary(fit_cT)
 ```
 
-Interpretation:
-With a positive coefficient of 1.14 and low p-value of 2.99e-05, we can assume that there is a significant positive relationship between survival time and the CT3 tumor size.
-
-
-
-5. cN when nearby lymph nodes are involved:
+5. cN vs OS: when nearby lymph nodes are involved:
 ```{r}
-fit_cN <- coxph(Surv(OS, death)~cN, data=lungSCC)
+fit_cN <- coxph(Surv(OS, death) ~ cN, data=lungSCC)
 summary(fit_cN)
 ```
-Interpretation:
-With a positive coefficient of 2.1621 and low p-value of  0.000321 , we can assume that there is a significant positive relationship between survival time and the cN3 near by nymph nodes.
-*We then select this covariate as significant for the upcoming study.*
 
-
-6. cM when distant metastasis are involved:
-
+6. cM vs OS: when distant metastasis are involved:
 ```{r}
-fit_cM <- coxph(Surv(OS, death)~cM, data=lungSCC)
+fit_cM <- coxph(Surv(OS, death) ~ cM, data=lungSCC)
 summary(fit_cM)
 ```
-Interpretation:
-With a positive coefficient of 2.1621 and high p-value of  0.667 , we can assume that there is a no significant  relationship between survival time and the cM distant metasis
 
-
-
-7. pT Peripheral Lung SCC size of Tumor:
+7. pT vs OS: peripheral lung SCC size of tumor:
 ```{r}
-fit_pT <- coxph(Surv(OS, death)~pT, data=lungSCC)
+fit_pT <- coxph(Surv(OS, death) ~ pT, data=lungSCC)
 summary(fit_pT)
 ```
-Interpretation:
-With a positive coefficient of 1.99 and a low p-value of 0.008, we can assume that there is a significant positive relationship between survival time and the pT3 tumor size.
-*We then select this covariate as significant for the upcoming study.*
 
-
-8. pN when nearby lymph nodes are involved
+8. pN vs OS: when nearby lymph nodes are involved:
 ```{r}
-fit_pN <- coxph(Surv(OS, death)~pN, data=lungSCC)
+fit_pN <- coxph(Surv(OS, death) ~ pN, data=lungSCC)
 summary(fit_pN)
 ```
-Interpretation:
-With a positive coefficient of 0.86 and a very low p-value of 1.51e-05, we can assume that there is a highly significant positive relationship between survival time and the pN2 nearby lymph nodes involved.
-*We then select this covariate as significant for the upcoming study.*
 
-
-9. pM when distant metastasis are involved
+9. pM vs OS: when distant metastasis are involved:
 ```{r}
-fit_pM <- coxph(Surv(OS, death)~pM, data=lungSCC)
+fit_pM <- coxph(Surv(OS, death) ~ pM, data=lungSCC)
 summary(fit_pM)
 ```
-Interpretation: #CAREFUL WITH THIS ONE
-With a positive coefficient of 1.77 and very low p-value of 0.0005, we can assume that there is a highly significant positive relationship between survival time and the pM1b distant metastasis involved.
-*We then select this covariate as significant for the upcoming study.*
 
-
-10. smoking state:
+10. Smoking_state vs OS: current smoking state of the patient:
 ```{r}
-fit_Smoking_state <- coxph(Surv(OS, death)~Smoking_state, data=lungSCC)
+fit_Smoking_state <- coxph(Surv(OS, death) ~ Smoking_state, data=lungSCC)
 summary(fit_Smoking_state)
 ```
 
-Interpretation:
-With all the p-value being greater than 0.05, we can conclude that smoking state has no effect on the survival .
-*We then reject the use of this covariate for the upcoming study.*
-
-11. FEV1_FVC pulmonary function test
+11. FEV1_FVC vs OS: pulmonary function test:
 ```{r}
-fit_FEV1FVC <- coxph(Surv(OS, death)~FEV1_FVC, data=lungSCC)
+fit_FEV1FVC <- coxph(Surv(OS, death) ~ FEV1_FVC, data=lungSCC)
 summary(fit_FEV1FVC)
 ```
-Interpretation:
-With a p-value of 0.1 we can assume that there is no significant relationship between survival time and the FEV1_FVC pulmonary function test.
-*We then reject the use of this covariate for the upcoming study.*
 
-
-12. CEA serum
+12. CEA vs OS: serum carcinoembryonic antigen level:
 ```{r}
-fit_CEA <- coxph(Surv(OS, death)~CEA, data=lungSCC)
+fit_CEA <- coxph(Surv(OS, death) ~ CEA, data=lungSCC)
 summary(fit_CEA)
 ```
-Interpretation:
-With a p-value of 0.6 we can assume that there is no significant relationship between survival time and the CEA serum.
-*We then reject the use of this covariate for the upcoming study.*
 
-
-13. the type of operation undergone:
+13. OP vs OS: the type of operation undergone by the patient:
 ```{r}
-fit_op_type <- coxph(Surv(OS, death)~op_type, data=lungSCC)
+fit_op_type <- coxph(Surv(OS, death) ~ OP, data=lungSCC)
 summary(fit_op_type)
 
 ```
-Interpretation:
-With a very low p-value of 2.17e-06  and a positive coefficient of 1.5034, we can assume that there is a highly significant positive relationship between survival time and the segmentectomy surgery.
 
-
-
-14. patient with and without observed metastasis after surgery (meta)
+14. meta vs OS: patient with and without observed metastasis after surgery:
 ```{r}
-fit_meta <- coxph(Surv(OS, death)~meta, data=lungSCC)
+fit_meta <- coxph(Surv(OS, death) ~ meta, data=lungSCC)
 summary(fit_meta)
 ```
-Interpretation:
-*1. Statistical significance:*
-Here, we can conclude that the variable meta have astatistically significant coefficient (z=5.444).
-*2. The regression coefficient:*
-With a value of 0.85, the sign of the regression coefficient is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group, that is, presence vs absence. The beta coefficient for meta=0.85 indicates that patients with observed metastasis have higher risk of death (lower survival rates) than patients without metastasis.
-*3. Hazard ratios (HR):*
-The exponentiated coefficient (exp(coef)=exp(0.85)=2.33) gives the effect size of covariates. Here, a patient with observed metastasis increases the hazard by a factor of 2.33, or 133%. Having observed metastasis is associated with bad prognostic.
-*4. Confidence intervals of the hazard ratios:*
-The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)), lower 95% bound=1.719, upper 95% bound=3.163.
-*5. Global statistical significance of the model:*
-Finally, the output gives p-values for three alternative tests for overall significance of the model: The likelihood-ratio test, Wald test, and score logrank statistics. These three methods are asymptotically equivalent.
 
-*Conclusion:*
-With a very low p-value of 5.22e-08 and a positive coefficient of 0.85, we can assume that there is a highly significant positive relationship between survival time and the observation of metastasis after surgery.
-*We then select this covariate as significant for the upcoming study.*
+>> FOR OPERATION DO WE HAVE TO USE OP OR OP_TYPE?
+
+The p-values of Sex (0.5), cM (0.7), Smoking_state (0.2), FEV1_FVC (0.1) and CEA (0.6) are too high to consider these features as statistically significant. We then reject the use of these five covariates for the upcoming study.
+
+Also, the repartition of the population in the groups is too unbalanced for the LN_ratio covariate so this feature will also be rejected for the next steps of the study.
+
+However, with a low p-value of *0.001* and a positive coefficient of *0.70*, we can assume that there is a statistically significant positive relationship between survival time (OS) and age over 60. With a value of *0.70*, the sign of the regression coefficient for age over 60 is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for age over 60=*0.70* indicates that patients aged over 60 have higher risk of death (lower survival rates) than younger patients. The exponentiated coefficient (exp(coef)=exp(0.70)=*2.01*) gives the effect size of covariates. Here, a patient older than 60 increases the hazard by a factor of *2.01*, or *101%*. Being older than 60 is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.33*, upper 95% bound=*3.06* for age over 60.
 
 
-*# Part 3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
-(Only when n of each gr kind of similar)
+>> TO COMPLETE
 
-List of features which have a significant relationship with survival time (OS):
-- Underlying_lung
-- LN_ratio > the repartition of the population in the groups is too unbalanced so we reject this covariate.
-- pT
-- pN
-- pM
-- meta
-- Necrosis
-- Age
-- cT
-- cN
-- op_type
-
-
-## Comparison between 2 groups of patients based on underlying lung disease
-
-```{r}
-fit.KM_under <- survfit(Surv(OS, death)~Underlying_lung, data=lungSCC)
-fit.KM_under
-```
-Interpretation:
-1. Among total 85 patients with emphysema, 43 of them died with 40% chance of death at 82 months.
-2. Among total 21 patients with ILA, 18 of them died with 5% chance of death at 21.5 months.
-3. Among total 292 patients without underlying lung disease, 111 of them died.
-
-We plot the Kaplan-Meier survival curve:
-```{r}
-ggsurvplot(fit.KM_under,
-           legend = "bottom",
-           conf.int = TRUE,
-           linetype = "strata",
-           legend.title = "Underlying lung disease",
-           xlab = "Months",
-           ylab = "Survival probability")
-```
-
-The logrank test:
-```{r}
-survdiff(Surv(OS, death)~Underlying_lung, data=lungSCC)
-```
-Interpretation:
-Logrank test result shows a significant difference in survival between these groups of patients (p=4e-11).
-
-
-## Comparison between 2 groups of patients based on Peripheral Lung SCC size of Tumor
-
-```{r}
-fit.KM_pT <- survfit(Surv(OS, death)~pT, data=lungSCC)
-fit.KM_pT
-```
-Interpretation:
-1. Among total 72 patients with pT1 Peripheral Lung SCC size of Tumor, 23 of them died.
-2. Among total 240 patients with pT2 Peripheral Lung SCC size of Tumor, 101 of them died with 82% chance of death at 103.3 months.
-3. Among total 78 patients with pT3 Peripheral Lung SCC size of Tumor, 43 of them died with 37% chance of death at 47.4 months.
-4. Among total 8 patients with pT4 Peripheral Lung SCC size of Tumor, 5 of them died with 30% chance of death at 74.9 months.
-
-We plot the Kaplan-Meier survival curve:
-```{r}
-ggsurvplot(fit.KM_pT,
-           legend = "bottom",
-           conf.int = TRUE,
-           linetype = "strata",
-           legend.title = "Peripheral Lung SCC size of Tumor",
-           xlab = "Months",
-           ylab = "Survival probability")
-```
-
-The logrank test:
-```{r}
-survdiff(Surv(OS, death)~pT, data=lungSCC)
-```
-Interpretation:
-Logrank test result doesn't show a significant difference in survival between these groups of patients (p=0.04).
-
-
-## Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved
-
-```{r}
-fit.KM_pN <- survfit(Surv(OS, death)~pN, data=lungSCC)
-fit.KM_pN
-```
-Interpretation:
-1. Among total 246 patients with pN0 when nearby lymph nodes are involved, 93 of them died.
-2. Among total 95 patients with pN1 when nearby lymph nodes are involved, 41 of them died.
-3. Among total 53 patients with pN2 when nearby lymph nodes are involved, 35 of them died with 30% chance of death at 37.5 months.
-4. Among total 4 patients with pN3 when nearby lymph nodes are involved, 3 of them died with 16% chance of death at 24.2 months.
-
-We plot the Kaplan-Meier survival curve:
-```{r}
-ggsurvplot(fit.KM_pN,
-           legend = "bottom",
-           conf.int = TRUE,
-           linetype = "strata",
-           legend.title = "pN when nearby lymph nodes are involved",
-           xlab = "Months",
-           ylab = "Survival probability")
-```
-The logrank test:
-```{r}
-survdiff(Surv(OS, death)~pN, data=lungSCC)
-```
-Interpretation:
-Logrank test result shows a significant difference in survival between these groups of patients (p=5e-05).
-
-
-## Comparison between 2 groups of patients based on pM when distant metastasis are involved
-
-```{r}
-fit.KM_pM <- survfit(Surv(OS, death)~pM, data=lungSCC)
-fit.KM_pM
-```
-Interpretation:
-1. Among total 394 patients with pM0 when distant metastasis are involved, 168 of them died with 84% chance of death at 103.3 months.
-2. Among total 4 patients with pM1b when distant metastasis are involved, all of them died with 3% chance of death at 5.35 months.
-
-We plot the Kaplan-Meier survival curve:
-```{r}
-ggsurvplot(fit.KM_pM,
-           legend = "bottom",
-           conf.int = TRUE,
-           linetype = "strata",
-           legend.title = "pM when distant metastasis are involved",
-           xlab = "Months",
-           ylab = "Survival probability")
-```
-
-The logrank test:
-```{r}
-survdiff(Surv(OS, death)~pM, data=lungSCC)
-```
-Interpretation:
-Logrank test result shows a significant difference in survival between these groups of patients (p=8e-05).
-
-
-## Comparison between 2 groups of patients based on observed metastasis after surgery
-
-```{r}
-fit.KM_meta <- survfit(Surv(OS, death)~meta, data=lungSCC)
-fit.KM_meta
-```
-Interpretation:
-1. Among total 238 patients without observed metastasis, 73 of them died.
-2. Among total 160 patients with observed metastasis, 99 of them died with 38% chance of death at 44.7 months.
-
-We plot the Kaplan-Meier survival curve:
-```{r}
-ggsurvplot(fit.KM_meta,
-           legend = "bottom",
-           conf.int = TRUE,
-           linetype = "strata",
-           legend.title = "Observation of metastasis",
-           xlab = "Months",
-           ylab = "Survival probability")
-```
-
-The logrank test:
-```{r}
-survdiff(Surv(OS, death)~meta, data=lungSCC)
-```
-Interpretation:
-Logrank test result shows a significant difference in survival between these groups of patients (p=2e-08).
-
-
-## Comparision between 2 groups of patients based on Necrosis
-
-```{r}
-fit.KM_Age <- survfit(Surv(OS, death)~AG, data=lungSCC)
-fit.KM_Age
-```
-
-We plot the Kaplan-Meier survival curve:
-```{r}
-ggsurvplot(fit.KM_Age,
-           legend = "bottom",
-           conf.int = TRUE,
-           linetype = "strata",
-           legend.title = "Observation of Age",
-           xlab = "Months",
-           ylab = "Survival probability")
-```
-
-
-## Multivariates Cox Regression
-Start with the full model with all variables
-```{r}
-
-lungSCC_fullmodel <- coxph(Surv(OS, death) ~ Location + Obst_pn_or_plugging + Necrosis + Underlying_lung + Effusion + Sex + AG + LN_ratio + cT+ cN + cM + pT+ pN+ pM + Smoking_state + FEV1_FVC + CEA + meta , data = lungSCC)
-
-```
-
-
-Automatic model selection based on AIC
-``` {r}
-lungSCC_multiCox <- step(lungSCC_fullmodel)
-```
-Interpretation:
-After backward selection, we found that the best model to predict survival time composes of 11 variables with the converted AIC 1827.39 from the original AIC  
-1846.56
-
-Note that this backward selection migh not convert to global optimum
-```{r}
-summary(lungSCC_multiCox)
-confint(lungSCC_multiCox)
-```
-Interpretation:
-1. The prediction concordance score of our multivariate model is 0.732
-
-2. Underlying lung disease: 
-   Patients who have ILA show 3 times higher risk (Shorter survival time) and patients without underlying lung disease have approximately 40% lower risk than those of patients with emphysema
-   
-3. Age: 
-   Patients that older than 60 years old have approximately 2 times higher risk than patients that younger than 60 years old of every 1 year older
-   
-4. Size of tumor in central lung cancer patients (cT):
-   Patients in criteria T2 (Tumor diameter 2.1-4 cm) and T3 (Tumor diameter 4.1-6 cm) have 2 and 3 times higher risk than patients with criteria T1 (Tumor diameter less than or equal to 0 cm), respectively.
-    Note that no significant different between patient cT1 and cT4 maybe because we have little number of cT4 patients (n=15)
-    
-5. Nearby lymph nodes that are involved in peripheral lung cancer patients (pN);
-   Peripheral lung cancer patients whom their cancers spread to lymph nodes within the lung or where the lung joins (N1), lymph nodes in the centre of the chest or under the windpipe brances off to each lung (N2), or lymph nodes on the opposite side of the chest from the affted lung or above the collar bone or at the top of the lung (N3) have approximately 2, 3 and 4 times higher risk than patients who show no nodal involvement.
-
-6. Metastasis of peripheral lung cancer patients (pM):
-   Peripheral lung cancer patients whom cancer spread to area outside the chest have 11 times higher risk than patients with no cancer spreading outside the lung
-
-7. Smoking history:
-   Patients who do not smoke have 80% lower risk than patients who have unknown record about smoking
-   Note: We should change the reference group from unknown to non smoking so that the interpretation will make more sense 
-8. FEV1/FVC ratio 
-   Every increasing unit of FEV1/FVC ratio unit will also increase the risk with approximately 1%
-   
-9. Metastasis 
-   For both type of lung cancer, patients who have cancer spreading outside the lung have approximately twice higher risk than those without metastasis
+*To conclude, we decide to select AG, cT, cN, pT, pN, pM, OP and meta as a significant covariates for the upcoming study.*
 
 
 
-Bring all significant feature to make another candidate model
-```{r}
-
-lungSCC_multiCox_2 <- coxph(Surv(OS, death) ~ Underlying_lung + AG + cT+ pN+ pM + Smoking_state + FEV1_FVC +  meta , data = lungSCC)
-
-summary(lungSCC_multiCox_2)
-
-```
-Interpretation:
-The concordance score of this model is less than the previous one which means the first model is better.
-
-Since lungSCC_multiCox_2 is the nested model of lungSCC_multiCox, to compare both model we will use Likelihood Ratio Test (LRT)
+*## Part2.A.3: Cox Proportional Hazards Regression Model fit - Multivariate Analysis*
 
 
-Comparing nested model: LRT
-```{r}
-anova(lungSCC_multiCox_2, lungSCC_multiCox)
-```
-Interpretation:
-Partial likelihood of model 2 (-895.68) is higher than model one (-925.63)
-and this difference in goodness of fit is statistically significant with p-value 9.676e-10.
-Similarly with the interpretaion of concordance score, the lungSCC_multiCox is the better model than lungSCC_multiCox_2
 
-
-Model diagnostics: Case deletion residuals
-```{r}
-dfbetas <- residuals(lungSCC_multiCox, type = 'dfbetas')
-lungSCC$dfbetas <- sqrt(rowSums(dfbetas^2))
-plot(lungSCC$dfbetas, type = 'h')
-abline(h = 0)
-```
-Interpretation:
-No patient with extremely information
