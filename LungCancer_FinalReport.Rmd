@@ -353,6 +353,7 @@ exp(-0.51250)
 ```
 Interpretation:
 Risk of death of lung cancer patients with ILA is almost 6 times higher than patient with emphysema while risk of death of no underlying lung disease patients is 40% lower than patients with emphysema.
+NOTE: Gonna make more sense if we change reference group fom emphysema to no remarkable lung disease!!!
 
 
 Define 95% confidence interval (CI) of odds ratio
@@ -1313,7 +1314,7 @@ Interpretation:
 
 7. Smoking history:
    Patients who do not smoke have 80% lower risk than patients who have unknown record about smoking
-
+   Note: We should change the reference group from unknown to non smoking so that the interpretation will make more sense 
 8. FEV1/FVC ratio 
    Every increasing unit of FEV1/FVC ratio unit will also increase the risk with approximately 1%
    
