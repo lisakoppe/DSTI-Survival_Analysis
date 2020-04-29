@@ -271,7 +271,7 @@ H0: there is no different in odds between that specific group and reference grou
 H1: Odds of that specific group and reference group is statistically significant
 
 Interpretation:
-Estimate of interception = The log odds when the specific condition equal 0
+Estimate of interception = The log odds when covariate(s) equal 0
 Estimate of each variable = The increase/decrese in the log odds when compare to reference group
 To define the odds ratio, exponent estimate value.
 
