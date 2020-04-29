@@ -109,7 +109,8 @@ lungSCC <- mutate(lungSCC_raw,
 
                   AG = factor(AG),
 
-                  OP = factor(op_type,labels = c("lobectomy","pneumonectomy","segmentectomy","LN biopsy","No OP")),
+                  OP = factor(op_type,levels = c("1", "2", "3", "4","5"),
+                              labels = c("lobectomy","pneumonectomy","segmentectomy","LN biopsy","No OP")),
 
                   Smoking_state = factor(Smoking_state,labels = c("unknown","current-smoker","ex- smoker", "non- smoker")),
 
@@ -1252,12 +1253,16 @@ Interpretation:
 Logrank test result shows a significant difference in survival between these groups of patients (p=2e-08).
 
 
-## Comparision between 2 groups of patients based on Necrosis
+## Comparision between 2 groups of patients based on Age
 
 ```{r}
 fit.KM_Age <- survfit(Surv(OS, death)~AG, data=lungSCC)
 fit.KM_Age
 ```
+Interpretation: 
+1. Among total 90 patients below the age of 60, 26 diead .
+2. Among total 308 patients above the age of 60, 146 diead with 63 % Chance of death at 82 months .
+
 
 We plot the Kaplan-Meier survival curve:
 ```{r}
@@ -1270,6 +1275,104 @@ ggsurvplot(fit.KM_Age,
            ylab = "Survival probability")
 ```
 
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~AG, data=lungSCC)
+```
+Interpretation : 
+Logrank test result shows a significant difference in survival between these groups of patients (p=8e-04 ).
+
+## Comparision between 2 groups of patients based on Central Tumor Size
+
+```{r}
+fit.KM_cT <- survfit(Surv(OS, death)~cT, data=lungSCC)
+fit.KM_cT
+```
+Interpretation: 
+1. Among total 73 patients with tumor size T1, 21 diead .
+2. Among total 252 patients with tumor size T2, 105 diead .
+3. Among total 58 patients with tumor size T3, 37 diead with  24 % chances of death at 39 months.
+4. Among total 15 patients with tumor size T4, 9 diead  .
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_cT,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Observation of cT",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~cT, data=lungSCC)
+```
+Interpretation : 
+Logrank test result shows a significant difference in survival between these groups of patients (p= 3e-0 ).
+
+## Comparision between 2 groups of patients based on Central Nearby lymph nodes that are involved
+```{r}
+fit.KM_cN <- survfit(Surv(OS, death)~cN, data=lungSCC)
+fit.KM_cN
+```
+Interpretation: 
+1. Among total 284 patients with N0 Nearby lymph nodes that are involved, 114 diead .
+2. Among total 68 patients with N1 Nearby lymph nodes that are involved, 27 diead .
+3. Among total 39 patients with N2 Nearby lymph nodes that are involved, 27 diead with  25 % chances of death at 38 months.
+4. Among total 7 patients with N0 Nearby lymph nodes that are involved, 4 diead with  18 % chances of death at 31 months.
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_cN,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Observation of cN",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~cN, data=lungSCC)
+```
+Interpretation : 
+Logrank test result shows a small difference in survival between these groups of patients (p= 0.002 ).
+
+## Comparision between 2 groups of patients based on Operation type
+```{r}
+fit.KM_op_type <- survfit(Surv(OS, death)~op_type, data=lungSCC)
+fit.KM_op_type
+```
+Interpretation: 
+1. Among total 325 patients with Type 1 surgery , 131 diead .
+2. Among total 54 patients with Type 2 surgery, 27 diead with  39 % chances of death at 82 months.
+3. Among total 4 patients with Type 3 surgery, 1 diead.
+4. Among total 13 patients with Type 4 surgery, 11 diead with  7 % chances of death at 15 months.
+5. Among total 2 patients with No operation , 2 diead with  25 % chances of death at 32 months.
+
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_op_type,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Observation of Operation type",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death)~op_type, data=lungSCC)
+```
+Interpretation : 
+Logrank test result shows a significant difference in survival between these groups of patients (p= 6e-06).
 
 ## Multivariates Cox Regression
 Start with the full model with all variables
