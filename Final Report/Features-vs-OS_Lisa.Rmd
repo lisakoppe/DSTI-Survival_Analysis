@@ -206,33 +206,6 @@ lungSCC <- mutate(lungSCC_raw,
     = Metastasis observed
     (0=Absent, 1=Present)
     
-
-# Check censoring coding
-+ = Patient survive (at least until that time point of the study)
-```{r}
-with(lungSCC, Surv(OS, death))
-```
-
-### Kaplan-Meier estimator
-
-Overall survival estimation:
-```{r}
-fit.KM <- survfit(Surv(OS, death) ~ 1, data = lungSCC)
-fit.KM
-```
-Interpretation:
-From total 398 patients, 172  (43%) were death
-Half of lung cancer patient will death within 103 months
-(We don't have upper bound because some patients survive until the end of study)
-RECHECK HOW TO INTERPREAT MEDIAN and KM plot WITH CENSORING DATA
-
-```{r}
-ggsurvplot(fit.KM,
-           legend.title = "Survival",
-           xlab = "Months",  
-           ylab = "Survival probability")
-```
-
 ______________________________________________________________________________________
 
 *# Part2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
@@ -247,9 +220,7 @@ ________________________________________________________________________________
 
 3. Results (+ include tables and code)
 
-Univariate Cox regression analysis
-Multivariate Cox regression analysis
-Visualizing the estimated distribution of survival times
++ Visualizing the estimated distribution of survival times
 
 
 
@@ -300,8 +271,6 @@ According to the outputed coefficients, the statistically significant features w
 - pN2: p-value=0.003
 - AG OV60: p-value=0.004
 - Underlying_lung, No Remark: p-value=0.008
-
->> DO WE NEED TO MAKE THE MODEL COMPARISONS?
 
 Let's save the table of results in a csv file:
 ```{r}
@@ -494,6 +463,48 @@ With a low p-value of *5.22e-08* and a positive coefficient of *0.85*, we can as
 
 
 *## Part2.A.3: Cox Proportional Hazards Regression Model fit - Multivariate Analysis*
+
+>> TO DO
+
+*# Part3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
+
+List of features which have a significant relationship with survival time (OS):
+
+1. Comparison between 2 groups of patients based on underlying lung disease
+2. Comparison between 2 groups of patients based on their age
+3. Comparison between 2 groups of patients based on central lung SCC size of tumor
+4. Comparison between 2 groups of patients based on cN when nearby lymph nodes are involved
+5. Comparison between 2 groups of patients based on peripheral lung SCC size of tumor
+6. Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved
+7. Comparison between 2 groups of patients based on pM when distant metastasis are involved
+8. Comparison between 2 groups of patients based on the type of operation undergone by the patient
+9. Comparison between 2 groups of patients based on the observation of metastasis after surgery
+
+
+1. Comparison between 2 groups of patients based on underlying lung disease:
+```{r}
+fit.KM_under <- survfit(Surv(OS, death) ~ Underlying_lung, data=lungSCC)
+fit.KM_under
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+ggsurvplot(fit.KM_under,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Underlying lung disease",
+           xlab = "Months",
+           ylab = "Survival probability")
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ Underlying_lung, data=lungSCC)
+```
+
+>> TO DO
+
 
 
 
