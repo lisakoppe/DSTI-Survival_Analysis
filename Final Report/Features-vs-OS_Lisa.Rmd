@@ -278,38 +278,38 @@ We here split the analysis into two groups of features:
 
 Features to be analyzed in this part:
 
-0. Location vs OS: tumor location
-1. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectais
-2. Necrosis vs OS: patients with or without cell necrosis or cavitation observed
-3. Underlying_lung vs OS: the type of underlying lung disease observed
-4. Effusion vs OS: patient with or without observed lung effusion
+1. Location vs OS: tumor location
+2. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectasis
+3. Necrosis vs OS: patients with or without cell necrosis or cavitation observed
+4. Underlying_lung vs OS: the type of underlying lung disease observed
+5. Effusion vs OS: patient with or without observed lung effusion
 
 
-0. Location vs OS: tumor location:
+1. Location vs OS: tumor location:
 ```{r}
 fit_location <- coxph(Surv(OS, death) ~ Location, data=lungSCC)
 summary(fit_location)
 ```
 
-1. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectais:
+2. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectasis:
 ```{r}
 fit_Obst_pn_or_plugging <- coxph(Surv(OS, death) ~ Obst_pn_or_plugging, data=lungSCC)
 summary(fit_Obst_pn_or_plugging)
 ```
 
-2. Necrosis vs OS: patients with or without cell necrosis or cavitation observed:
+3. Necrosis vs OS: patients with or without cell necrosis or cavitation observed:
 ```{r}
 fit_necrosis <- coxph(Surv(OS, death) ~ Necrosis, data=lungSCC)
 summary(fit_necrosis)
 ```
 
-3. Underlying_lung vs OS: the type of underlying lung disease observed:
+4. Underlying_lung vs OS: the type of underlying lung disease observed:
 ```{r}
 fit_UndLung <- coxph(Surv(OS, death) ~ Underlying_lung, data=lungSCC)
 summary(fit_UndLung)
 ```
 
-4. Effusion vs OS: patient with or without observed lung effusion:
+5. Effusion vs OS: patient with or without observed lung effusion:
 ```{r}
 fit_effusion <- coxph(Surv(OS, death) ~ Effusion, data=lungSCC)
 summary(fit_effusion)
