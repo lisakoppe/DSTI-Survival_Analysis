@@ -22,25 +22,26 @@ library(asaur)
 ```{r}
 lungSCC_raw <- read_csv("../LungCancer.csv",
                          col_types=cols(Sex='c',
-                                       Age='d',
+                                       Age='c',
                                        Location='d',
                                        Obst_pn_or_plugging='d',
                                        Necrosis='d',
                                        Underlying_lung='d',
                                        Effusion='d',
                                        LN_ratio='d',
-                                       cT='d',
-                                       cN='d',
-                                       cM='d',
-                                       pT='d',
-                                       pN='d',
-                                       pM='d',
-                                       Smoking_state='d',  
+                                       cT='c',
+                                       cN='c',
+                                       cM='c',
+                                       pT='c',
+                                       pN='c',
+                                       pM='c',
+                                       Smoking_state='c',  
                                        FEV1_FVC='d',
                                        CEA='d',
-                                       op_type='d',
+                                       op_type='c',
                                        death='d',
-                                       meta='d',
+                                       OP_site_recur='l',
+                                       meta='l',
                                        OS = "d",
                                        .default = 'c'))
 ```
@@ -88,27 +89,29 @@ summary(lungSCC_raw$OS)
 
 Redefine the meaning of each label to make it easier for interpretation
 
-
 ```{r}
 
 lungSCC <- mutate(lungSCC_raw,
-                  Location=ifelse(Location==0, "Peripheral","Central"),
+                  Location=ifelse(Location==0, "Peripheral", "Central"),
+                  
+                  Sex=factor(Sex, levels=c("F", "M")),
 
-                  Necrosis=ifelse(Necrosis==0, "NoRemark",
-                                  ifelse(Necrosis==1, "Necrosis", "Cavitation")),
+                  Necrosis = factor(Necrosis, levels = c("0", "1", "2"), labels = c("NoRemark", "Necrosis", "Cavitation")),
+                  Necrosis <- relevel(Necrosis, "NoRemark"),
 
-                  Underlying_lung=ifelse(Underlying_lung==0, "NoRemark",
-                                         ifelse(Underlying_lung==1, "Emphysema", "ILA")),
+                  Underlying_lung = factor(Underlying_lung, levels = c("0", "1", "2"), labels = c("NoRemark", "Emphysema", "ILA")),
+                  Underlying_lung <- relevel(Underlying_lung, "NoRemark"),
 
                   Effusion=factor(Effusion, levels=c("0", "1"), labels=c("Absent", "Present")),
 
-                  AG=ifelse((Age<60), "LT60", "OV60"),
-
+                  AG = ifelse((Age<60), "LT60", "OV60"),
                   AG = factor(AG),
 
-                  OP = factor(op_type,labels = c("lobectomy","pneumonectomy","segmentectomy","LN biopsy","No OP")),
+                  OP = factor(op_type, levels = c("5", "1", "2", "3", "4"), labels = c("No op", "Lobectomy", "Pneumonectomy", "Segmentectomy", "LN biopsy")),
+                  OP <- relevel(OP, "No op"),
 
-                  Smoking_state = factor(Smoking_state,labels = c("unknown","current-smoker","ex- smoker", "non- smoker")),
+                  Smoking_state = factor(Smoking_state, levels = c("3", "1", "2", "0"), labels = c("Non-smoker", "Current-smoker", "Ex-smoker", "Unknown")),
+                  Smoking_state <- relevel(Smoking_state, "Non-smoker"),
 
                   cT = factor(cT, levels = c("1", "2", "3", "4"), labels = c("cT1", "cT2", "cT3", "cT4")),
 
@@ -210,27 +213,9 @@ ________________________________________________________________________________
 
 *# Part2: Test relationship between radiologic/clinicopathologic features and survival time (OS)*
 
-1. Question asked
-
-2. Methods used
-- Cox Proportional Hazards Model
-- Confidence intervals
-- Kaplan-Meier estimator
-- Logrank test
-
-3. Results (+ include tables and code)
-
-+ Visualizing the estimated distribution of survival times
-
-
-
 *## Part2.A: Cox Proportional Hazards Regression Model fit*
 
->> DESCRIBE THE METHODS TO USE
-
 Methods used: Cox Proportional Hazards Model
-
-we use R coxph():
 
 The Cox regression results can be interpreted as follow:
 
@@ -254,8 +239,6 @@ Thanks to these results, we can decide to reject or keep covariates for the upco
 
 *## Part2.A.1: Cox Proportional Hazards Regression Model fit including all the studied features*
 
->> INTRODUCE REGRESSION
-
 ```{r}
 lungSCC_fullmodel <- coxph(Surv(OS, death) ~ Location + Obst_pn_or_plugging + Necrosis + Underlying_lung + Effusion + Sex + AG + LN_ratio + cT+ cN + cM + pT+ pN+ pM + Smoking_state + FEV1_FVC + CEA + OP + meta, data=lungSCC)
 
@@ -263,14 +246,16 @@ summary(lungSCC_fullmodel)
 ```
 
 According to the outputed coefficients, the statistically significant features we could consider keeping for the next steps of the study are the following (ranked by order of significancy):
-- meta: p-value=0.0000004
-- Underlying_lungILA: p-value=0.0002
+- Underlying_lungILA: p-value=0.00000002
+- metaTRUE: p-value=0.0000004
 - pM1b: p-value=0.0003
-- Smoking_state, non-smoker: p-value=0.0009
+- Smoking_state, unknown: p-value=0.0009
 - cT3: p-value=0.002
+- Smoking_state, ex-smoker: p-value=0.002
 - pN2: p-value=0.003
 - AG OV60: p-value=0.004
-- Underlying_lung, No Remark: p-value=0.008
+- Smoking_state, current smoker: p-value=0.005
+- Underlying_lung, emphysema: p-value=0.008
 
 Let's save the table of results in a csv file:
 ```{r}
@@ -288,18 +273,24 @@ We here split the analysis into two groups of features:
 - Radiologic features
 - Clinicopathologic features
 
->> DO NOT FORGET TO PUT COX FOR LOCATION SOMEWHERE
 
 *### Part2.A.2.a:Relationship between radiologic features and survival time (OS)*
 
 Features to be analyzed in this part:
 
+0. Location vs OS: tumor location
 1. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectais
 2. Necrosis vs OS: patients with or without cell necrosis or cavitation observed
 3. Underlying_lung vs OS: the type of underlying lung disease observed
 4. Effusion vs OS: patient with or without observed lung effusion
 
 >> CAREFUL WITH "CAVITATION" SPELLING EVERYWHERE IN REPORT
+
+0. Location vs OS: tumor location:
+```{r}
+fit_location <- coxph(Surv(OS, death) ~ Location, data=lungSCC)
+summary(fit_location)
+```
 
 1. Obst_pn_or_plugging vs OS: patients with or without obstructive pneumonitis/atelectais:
 ```{r}
@@ -325,9 +316,9 @@ fit_effusion <- coxph(Surv(OS, death) ~ Effusion, data=lungSCC)
 summary(fit_effusion)
 ```
 
-The p-values of Obst_pn_or_plugging (0.1), Necrosis (0.05) and effusion (0.9) are too high to consider these features as statistically significant. We then reject the use of these three covariates for the upcoming study.
+The p-values of Location (0.09), Obst_pn_or_plugging (0.1), Necrosis (0.05) and effusion (0.9) are too high to consider these features as statistically significant. We then reject the use of these four covariates for the upcoming study.
 
-However, with a very low p-value of *1.95e-05* and a positive coefficient of *1.21*, we can assume that there is a highly significant positive relationship between survival time (OS) and Interstitial lung abnormalities (ILA). With a value of *1.21*, the sign of the regression coefficient for ILA is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for ILA=*1.21* indicates that patients with ILA have higher risk of death (lower survival rates) than patients with emphysema. The exponentiated coefficient (exp(coef)=exp(1.21)=*3.35*) gives the effect size of covariates. Here, a patient with ILA increases the hazard by a factor of *3.35*, or *235%*. Having ILA is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.92*, upper 95% bound=*5.83* for ILA.
+However, with a very low p-value of *3.93e-10* and a positive coefficient of *1.61*, we can assume that there is a highly significant positive relationship between survival time (OS) and Interstitial lung abnormalities (ILA). With a value of *1.61*, the sign of the regression coefficient for ILA is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for ILA=*1.61* indicates that patients with ILA have higher risk of death (lower survival rates) than patients with emphysema. The exponentiated coefficient (exp(coef)=exp(1.61)=*5.00*) gives the effect size of covariates. Here, a patient with ILA increases the hazard by a factor of *5.00*, or *400%*. Having ILA is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*3.02*, upper 95% bound=*8.28* for ILA.
 
 *To conclude, we decide to select Underlying_lung as a significant covariate for the upcoming study.*
 
@@ -437,8 +428,6 @@ fit_meta <- coxph(Surv(OS, death) ~ meta, data=lungSCC)
 summary(fit_meta)
 ```
 
->> FOR OPERATION DO WE HAVE TO USE OP OR OP_TYPE?
-
 The p-values of Sex (0.5), cM (0.7), Smoking_state (0.2), FEV1_FVC (0.1) and CEA (0.6) are too high to consider these features as statistically significant. We then reject the use of these five covariates for the upcoming study.
 
 Also, the repartition of the population in the groups is too unbalanced for the LN_ratio covariate so this feature will also be rejected for the next steps of the study.
@@ -462,11 +451,7 @@ With a low p-value of *5.22e-08* and a positive coefficient of *0.85*, we can as
 *To conclude, we decide to select AG, cT, cN, pT, pN, pM, OP and meta as a significant covariates for the upcoming study.*
 
 
-*## Part2.A.3: Cox Proportional Hazards Regression Model fit - Multivariate Analysis*
-
->> TO DO
-
-*# Part3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
+*## Part2.A.3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
 
 List of features which have a significant relationship with survival time (OS):
 
@@ -489,13 +474,15 @@ fit.KM_under
 
 We plot the Kaplan-Meier survival curve:
 ```{r}
-ggsurvplot(fit.KM_under,
+gg <- ggsurvplot(fit.KM_under,
            legend = "bottom",
            conf.int = TRUE,
            linetype = "strata",
            legend.title = "Underlying lung disease",
            xlab = "Months",
            ylab = "Survival probability")
+gg
+ggsave("KM_Underlying lung disease.png", plot=print(gg))
 ```
 
 The logrank test:
@@ -503,8 +490,210 @@ The logrank test:
 survdiff(Surv(OS, death) ~ Underlying_lung, data=lungSCC)
 ```
 
->> TO DO
+
+2. Comparison between 2 groups of patients based on their age:
+```{r}
+fit.KM_AG <- survfit(Surv(OS, death) ~ AG, data=lungSCC)
+fit.KM_AG
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+gg <- ggsurvplot(fit.KM_AG,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "Age",
+           xlab = "Months",
+           ylab = "Survival probability")
+gg
+ggsave("KM_Age.png", plot=print(gg))
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ AG, data=lungSCC)
+```
 
 
+3. Comparison between 2 groups of patients based on central lung SCC size of tumor:
+```{r}
+fit.KM_cT <- survfit(Surv(OS, death) ~ cT, data=lungSCC)
+fit.KM_cT
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+gg <- ggsurvplot(fit.KM_cT,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "central lung SCC size of tumor",
+           xlab = "Months",
+           ylab = "Survival probability")
+gg
+ggsave("KM_cT.png", plot=print(gg))
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ cT, data=lungSCC)
+```
+
+
+4. Comparison between 2 groups of patients based on cN when nearby lymph nodes are involved:
+```{r}
+fit.KM_cN <- survfit(Surv(OS, death) ~ cN, data=lungSCC)
+fit.KM_cN
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+gg <- ggsurvplot(fit.KM_cN,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "cN when nearby lymph nodes are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+gg
+ggsave("KM_cN.png", plot=print(gg))
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ cN, data=lungSCC)
+```
+
+
+5. Comparison between 2 groups of patients based on peripheral lung SCC size of tumor:
+```{r}
+fit.KM_pT <- survfit(Surv(OS, death) ~ pT, data=lungSCC)
+fit.KM_pT
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+gg <- ggsurvplot(fit.KM_pT,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "peripheral lung SCC size of tumor",
+           xlab = "Months",
+           ylab = "Survival probability")
+gg
+ggsave("KM_pT.png", plot=print(gg))
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ pT, data=lungSCC)
+```
+
+
+6. Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved:
+```{r}
+fit.KM_pN <- survfit(Surv(OS, death) ~ pN, data=lungSCC)
+fit.KM_pN
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+gg <- ggsurvplot(fit.KM_pN,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "pN when nearby lymph nodes are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+gg
+ggsave("KM_pN.png", plot=print(gg))
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ pN, data=lungSCC)
+```
+
+
+7. Comparison between 2 groups of patients based on pM when distant metastasis are involved:
+```{r}
+fit.KM_pM <- survfit(Surv(OS, death) ~ pM, data=lungSCC)
+fit.KM_pM
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+gg <- ggsurvplot(fit.KM_pM,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "pM when distant metastasis are involved",
+           xlab = "Months",
+           ylab = "Survival probability")
+gg
+ggsave("KM_pM.png", plot=print(gg))
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ pM, data=lungSCC)
+```
+
+
+8. Comparison between 2 groups of patients based on the type of operation undergone by the patient:
+```{r}
+fit.KM_OP <- survfit(Surv(OS, death) ~ OP, data=lungSCC)
+fit.KM_OP
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+gg <- ggsurvplot(fit.KM_OP,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "type of operation undergone by the patient",
+           xlab = "Months",
+           ylab = "Survival probability")
+gg
+ggsave("KM_OP.png", plot=print(gg))
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ OP, data=lungSCC)
+```
+
+
+9. Comparison between 2 groups of patients based on the observation of metastasis after surgery:
+```{r}
+fit.KM_meta <- survfit(Surv(OS, death) ~ meta, data=lungSCC)
+fit.KM_meta
+```
+
+We plot the Kaplan-Meier survival curve:
+```{r}
+gg <- ggsurvplot(fit.KM_meta,
+           legend = "bottom",
+           conf.int = TRUE,
+           linetype = "strata",
+           legend.title = "metastasis after surgery",
+           xlab = "Months",
+           ylab = "Survival probability")
+gg
+ggsave("KM_meta.png", plot=print(gg))
+```
+
+The logrank test:
+```{r}
+survdiff(Surv(OS, death) ~ meta, data=lungSCC)
+```
+
+>> ADD INTERPRETATIONS HERE + PROPORTIONAL
+
+
+
+*# Part3: Cox Proportional Hazards Regression Model fit - Multivariate Analysis*
 
 
