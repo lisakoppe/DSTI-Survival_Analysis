@@ -64,8 +64,8 @@ table(lungSCC_raw$Effusion, useNA="always")
 
 # Clinicopathologic features
 table(lungSCC_raw$Sex, useNA="always")
-table(lungSCC_raw$Age, useNA="always")
-summary(lungSCC_raw$Age)
+table(lungSCC_raw$AG, useNA="always")
+summary(lungSCC_raw$AG)
 table(lungSCC_raw$LN_ratio, useNA="always")
 summary(lungSCC_raw$LN_ratio)
 table(lungSCC_raw$cT, useNA="always")
@@ -79,7 +79,7 @@ table(lungSCC_raw$FEV1_FVC, useNA="always")
 summary(lungSCC_raw$FEV1_FVC)
 table(lungSCC_raw$CEA)
 summary(lungSCC_raw$CEA)
-table(lungSCC_raw$op_type, useNA="always")
+table(lungSCC_raw$OP, useNA="always")
 table(lungSCC_raw$death, useNA="always")
 table(lungSCC_raw$meta, useNA="always")
 table(lungSCC_raw$OS, useNA="always")
@@ -110,7 +110,7 @@ lungSCC <- mutate(lungSCC_raw,
                   OP = factor(op_type, levels = c("5", "1", "2", "3", "4"), labels = c("No op", "Lobectomy", "Pneumonectomy", "Segmentectomy", "LN biopsy")),
                   OP <- relevel(OP, "No op"),
 
-                  Smoking_state = factor(Smoking_state, levels = c("3", "1", "2", "0"), labels = c("Non-smoker", "Current-smoker", "Ex-smoker", "Unknown")),
+                  Smoking_state = factor(Smoking_state, levels = c("3", "0", "1", "2"), labels = c("Non-smoker", "Current-smoker", "Ex-smoker", "Unknown")),
                   Smoking_state <- relevel(Smoking_state, "Non-smoker"),
 
                   cT = factor(cT, levels = c("1", "2", "3", "4"), labels = c("cT1", "cT2", "cT3", "cT4")),
@@ -284,7 +284,6 @@ Features to be analyzed in this part:
 3. Underlying_lung vs OS: the type of underlying lung disease observed
 4. Effusion vs OS: patient with or without observed lung effusion
 
->> CAREFUL WITH "CAVITATION" SPELLING EVERYWHERE IN REPORT
 
 0. Location vs OS: tumor location:
 ```{r}
@@ -430,7 +429,7 @@ summary(fit_meta)
 
 The p-values of Sex (0.5), cM (0.7), Smoking_state (0.2), FEV1_FVC (0.1) and CEA (0.6) are too high to consider these features as statistically significant. We then reject the use of these five covariates for the upcoming study.
 
-Also, the repartition of the population in the groups is too unbalanced for the LN_ratio covariate so this feature will also be rejected for the next steps of the study.
+Also, the repartition of the population in the groups is too unbalanced for the LN_ratio and the OP covariates so these features will also be rejected for the next steps of the study.
 
 However, with a low p-value of *0.001* and a positive coefficient of *0.70*, we can assume that there is a statistically significant positive relationship between survival time (OS) and age over 60. With a value of *0.70*, the sign of the regression coefficient for age over 60 is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for age over 60=*0.70* indicates that patients aged over 60 have higher risk of death (lower survival rates) than younger patients. The exponentiated coefficient (exp(coef)=exp(0.70)=*2.01*) gives the effect size of covariates. Here, a patient older than 60 increases the hazard by a factor of *2.01*, or *101%*. Being older than 60 is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.33*, upper 95% bound=*3.06* for age over 60.
 
@@ -444,11 +443,9 @@ With a low p-value of *1.51e-05* and a positive coefficient of *0.86*, we can as
 
 With a low p-value of *0.0005* and a positive coefficient of *1.77*, we can assume that there is a statistically significant positive relationship between survival time (OS) and pM1b. With a value of *1.77*, the sign of the regression coefficient for pM1b is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for pM1b=*1.77* indicates that patients with pM1b have higher risk of death (lower survival rates) than patients with pM0. The exponentiated coefficient (exp(coef)=exp(1.77)=*5.85*) gives the effect size of covariates. Here, a patient with pM1b increases the hazard by a factor of *5.85*, or *485%*. Having pM1b is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*2.16*, upper 95% bound=*15.84* for pM1b.
 
-With a low p-value of *2.17e-06* and a positive coefficient of *1.50*, we can assume that there is a statistically significant positive relationship between survival time (OS) and biopsy operation type. With a value of *1.50*, the sign of the regression coefficient for biopsy is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for biopsy=*1.50* indicates that patients who undergo biopsy have higher risk of death (lower survival rates) than patients who undergo lobectomy. The exponentiated coefficient (exp(coef)=exp(1.50)=*4.50*) gives the effect size of covariates. Here, a patient who undergo biopsy increases the hazard by a factor of *4.50*, or *350%*. Biopsy operation type is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*2.41*, upper 95% bound=*8.37* for biopsy.
-
 With a low p-value of *5.22e-08* and a positive coefficient of *0.85*, we can assume that there is a statistically significant positive relationship between survival time (OS) and the observation of metastasis. With a value of *0.85*, the sign of the regression coefficient for observed metastasis is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for observed metastasis=*0.85* indicates that patients with observed metastasis have higher risk of death (lower survival rates) than patients without metastasis. The exponentiated coefficient (exp(coef)=exp(0.85)=*2.33*) gives the effect size of covariates. Here, a patient with observed metastasis increases the hazard by a factor of *2.33*, or *133%*. Observed metastasis is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.72*, upper 95% bound=*3.16* for observed metastasis.
 
-*To conclude, we decide to select AG, cT, cN, pT, pN, pM, OP and meta as a significant covariates for the upcoming study.*
+*To conclude, we decide to select AG, cT, cN, pT, pN, pM, and meta as a significant covariates for the upcoming study.*
 
 
 *## Part2.A.3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
@@ -462,8 +459,7 @@ List of features which have a significant relationship with survival time (OS):
 5. Comparison between 2 groups of patients based on peripheral lung SCC size of tumor
 6. Comparison between 2 groups of patients based on pN when nearby lymph nodes are involved
 7. Comparison between 2 groups of patients based on pM when distant metastasis are involved
-8. Comparison between 2 groups of patients based on the type of operation undergone by the patient
-9. Comparison between 2 groups of patients based on the observation of metastasis after surgery
+8. Comparison between 2 groups of patients based on the observation of metastasis after surgery
 
 
 1. Comparison between 2 groups of patients based on underlying lung disease:
@@ -641,32 +637,7 @@ survdiff(Surv(OS, death) ~ pM, data=lungSCC)
 ```
 
 
-8. Comparison between 2 groups of patients based on the type of operation undergone by the patient:
-```{r}
-fit.KM_OP <- survfit(Surv(OS, death) ~ OP, data=lungSCC)
-fit.KM_OP
-```
-
-We plot the Kaplan-Meier survival curve:
-```{r}
-gg <- ggsurvplot(fit.KM_OP,
-           legend = "bottom",
-           conf.int = TRUE,
-           linetype = "strata",
-           legend.title = "type of operation undergone by the patient",
-           xlab = "Months",
-           ylab = "Survival probability")
-gg
-ggsave("KM_OP.png", plot=print(gg))
-```
-
-The logrank test:
-```{r}
-survdiff(Surv(OS, death) ~ OP, data=lungSCC)
-```
-
-
-9. Comparison between 2 groups of patients based on the observation of metastasis after surgery:
+8. Comparison between 2 groups of patients based on the observation of metastasis after surgery:
 ```{r}
 fit.KM_meta <- survfit(Surv(OS, death) ~ meta, data=lungSCC)
 fit.KM_meta
