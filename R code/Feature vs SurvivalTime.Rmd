@@ -5,7 +5,7 @@ date: "4/23/2020"
 output: word_document
 ---
 
-Paper:
+Data Source:
 [Integrated evaluation of clinical, pathological and radiological prognostic factors in squamous cell carcinoma of the lung](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6777828/)
 
 # Import the necessary packages:
@@ -44,46 +44,6 @@ lungSCC_raw <- read_csv("../LungCancer.csv",
                                        meta='l',
                                        OS = "d",
                                        .default = 'c'))
-```
-
-# Explore the dataset:
-    - For classification data, use "table"
-    - For numerical data: use "table" + "summary"
-      (Summary to define basic descriptive statistic, Table to check null value)
-
-```{r}
-dim(lungSCC_raw)  # Check total patients + columns
-
-
-# Radiologic features
-table(lungSCC_raw$Location, useNA="always")
-table(lungSCC_raw$Obst_pn_or_plugging, useNA="always")
-table(lungSCC_raw$Necrosis, useNA="always")
-table(lungSCC_raw$Underlying_lung, useNA="always")
-table(lungSCC_raw$Effusion, useNA="always")
-
-# Clinicopathologic features
-table(lungSCC_raw$Sex, useNA="always")
-table(lungSCC_raw$AG, useNA="always")
-summary(lungSCC_raw$AG)
-table(lungSCC_raw$LN_ratio, useNA="always")
-summary(lungSCC_raw$LN_ratio)
-table(lungSCC_raw$cT, useNA="always")
-table(lungSCC_raw$cN, useNA="always")
-table(lungSCC_raw$cM, useNA="always")
-table(lungSCC_raw$pT, useNA="always")
-table(lungSCC_raw$pN, useNA="always")
-table(lungSCC_raw$pM, useNA="always")
-table(lungSCC_raw$Smoking_state, useNA="always")
-table(lungSCC_raw$FEV1_FVC, useNA="always")
-summary(lungSCC_raw$FEV1_FVC)
-table(lungSCC_raw$CEA)
-summary(lungSCC_raw$CEA)
-table(lungSCC_raw$OP, useNA="always")
-table(lungSCC_raw$death, useNA="always")
-table(lungSCC_raw$meta, useNA="always")
-table(lungSCC_raw$OS, useNA="always")
-summary(lungSCC_raw$OS)
 ```
 
 
@@ -245,17 +205,6 @@ lungSCC_fullmodel <- coxph(Surv(OS, death) ~ Location + Obst_pn_or_plugging + Ne
 summary(lungSCC_fullmodel)
 ```
 
-According to the outputed coefficients, the statistically significant features we could consider keeping for the next steps of the study are the following (ranked by order of significancy):
-- Underlying_lungILA: p-value=0.00000002
-- metaTRUE: p-value=0.0000004
-- pM1b: p-value=0.0003
-- Smoking_state, unknown: p-value=0.0009
-- cT3: p-value=0.002
-- Smoking_state, ex-smoker: p-value=0.002
-- pN2: p-value=0.003
-- AG OV60: p-value=0.004
-- Smoking_state, current smoker: p-value=0.005
-- Underlying_lung, emphysema: p-value=0.008
 
 Let's save the table of results in a csv file:
 ```{r}
@@ -314,12 +263,6 @@ summary(fit_UndLung)
 fit_effusion <- coxph(Surv(OS, death) ~ Effusion, data=lungSCC)
 summary(fit_effusion)
 ```
-
-The p-values of Location (0.09), Obst_pn_or_plugging (0.1), Necrosis (0.05) and effusion (0.9) are too high to consider these features as statistically significant. We then reject the use of these four covariates for the upcoming study.
-
-However, with a very low p-value of *3.93e-10* and a positive coefficient of *1.61*, we can assume that there is a highly significant positive relationship between survival time (OS) and Interstitial lung abnormalities (ILA). With a value of *1.61*, the sign of the regression coefficient for ILA is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for ILA=*1.61* indicates that patients with ILA have higher risk of death (lower survival rates) than patients with emphysema. The exponentiated coefficient (exp(coef)=exp(1.61)=*5.00*) gives the effect size of covariates. Here, a patient with ILA increases the hazard by a factor of *5.00*, or *400%*. Having ILA is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*3.02*, upper 95% bound=*8.28* for ILA.
-
-*To conclude, we decide to select Underlying_lung as a significant covariate for the upcoming study.*
 
 
 *### Part2.A.2.b:Relationship between clinicopathologic features and survival time (OS)*
@@ -426,26 +369,6 @@ summary(fit_op_type)
 fit_meta <- coxph(Surv(OS, death) ~ meta, data=lungSCC)
 summary(fit_meta)
 ```
-
-The p-values of Sex (0.5), cM (0.7), Smoking_state (0.2), FEV1_FVC (0.1) and CEA (0.6) are too high to consider these features as statistically significant. We then reject the use of these five covariates for the upcoming study.
-
-Also, the repartition of the population in the groups is too unbalanced for the LN_ratio and the OP covariates so these features will also be rejected for the next steps of the study.
-
-However, with a low p-value of *0.001* and a positive coefficient of *0.70*, we can assume that there is a statistically significant positive relationship between survival time (OS) and age over 60. With a value of *0.70*, the sign of the regression coefficient for age over 60 is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for age over 60=*0.70* indicates that patients aged over 60 have higher risk of death (lower survival rates) than younger patients. The exponentiated coefficient (exp(coef)=exp(0.70)=*2.01*) gives the effect size of covariates. Here, a patient older than 60 increases the hazard by a factor of *2.01*, or *101%*. Being older than 60 is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.33*, upper 95% bound=*3.06* for age over 60.
-
-With a low p-value of *2.99e-05* and a positive coefficient of *1.14*, we can assume that there is a statistically significant positive relationship between survival time (OS) and cT3. With a value of *1.14*, the sign of the regression coefficient for cT3 is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for cT3=*1.14* indicates that patients with cT3 have higher risk of death (lower survival rates) than patients with cT1. The exponentiated coefficient (exp(coef)=exp(1.14)=*3.14*) gives the effect size of covariates. Here, a patient with cT3 increases the hazard by a factor of *3.14*, or *214%*. Having cT3 is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.84*, upper 95% bound=*5.38* for cT3.
-
-With a low p-value of *0.0003* and a positive coefficient of *0.77*, we can assume that there is a statistically significant positive relationship between survival time (OS) and cN2. With a value of *0.77*, the sign of the regression coefficient for cN2 is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for cN2=*0.77* indicates that patients with cN2 have higher risk of death (lower survival rates) than patients with cN0. The exponentiated coefficient (exp(coef)=exp(0.77)=*2.16*) gives the effect size of covariates. Here, a patient with cN2 increases the hazard by a factor of *2.16*, or *116%*. Having cN2 is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.42*, upper 95% bound=*3.29* for cN2.
-
-With a low p-value of *0.007* and a positive coefficient of *0.69*, we can assume that there is a statistically significant positive relationship between survival time (OS) and pT3. With a value of *0.69*, the sign of the regression coefficient for pT3 is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for pT3=*0.69* indicates that patients with pT3 have higher risk of death (lower survival rates) than patients with pT1. The exponentiated coefficient (exp(coef)=exp(0.69)=*1.99*) gives the effect size of covariates. Here, a patient with pT3 increases the hazard by a factor of *1.99*, or *99%*. Having pT3 is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.20*, upper 95% bound=*3.30* for pT3.
-
-With a low p-value of *1.51e-05* and a positive coefficient of *0.86*, we can assume that there is a statistically significant positive relationship between survival time (OS) and pN2. With a value of *0.86*, the sign of the regression coefficient for pN2 is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for pN2=*0.86* indicates that patients with pN2 have higher risk of death (lower survival rates) than patients with pN0. The exponentiated coefficient (exp(coef)=exp(0.86)=*2.37*) gives the effect size of covariates. Here, a patient with pN2 increases the hazard by a factor of *2.37*, or *137%*. Having pN2 is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.60*, upper 95% bound=*3.50* for pN2.
-
-With a low p-value of *0.0005* and a positive coefficient of *1.77*, we can assume that there is a statistically significant positive relationship between survival time (OS) and pM1b. With a value of *1.77*, the sign of the regression coefficient for pM1b is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for pM1b=*1.77* indicates that patients with pM1b have higher risk of death (lower survival rates) than patients with pM0. The exponentiated coefficient (exp(coef)=exp(1.77)=*5.85*) gives the effect size of covariates. Here, a patient with pM1b increases the hazard by a factor of *5.85*, or *485%*. Having pM1b is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*2.16*, upper 95% bound=*15.84* for pM1b.
-
-With a low p-value of *5.22e-08* and a positive coefficient of *0.85*, we can assume that there is a statistically significant positive relationship between survival time (OS) and the observation of metastasis. With a value of *0.85*, the sign of the regression coefficient for observed metastasis is positive which means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The beta coefficient for observed metastasis=*0.85* indicates that patients with observed metastasis have higher risk of death (lower survival rates) than patients without metastasis. The exponentiated coefficient (exp(coef)=exp(0.85)=*2.33*) gives the effect size of covariates. Here, a patient with observed metastasis increases the hazard by a factor of *2.33*, or *133%*. Observed metastasis is indeed associated with bad prognostic. Moreover, the summary output also gives upper and lower 95% confidence intervals (CI) for the hazard ratio (exp(coef)) as follows: lower 95% bound=*1.72*, upper 95% bound=*3.16* for observed metastasis.
-
-*To conclude, we decide to select AG, cT, cN, pT, pN, pM, and meta as a significant covariates for the upcoming study.*
 
 
 *## Part2.A.3: Kaplan-Meier estimator with features which have a significant relationship with survival time (OS)*
@@ -660,44 +583,6 @@ The logrank test:
 ```{r}
 survdiff(Surv(OS, death) ~ meta, data=lungSCC)
 ```
-
-The Logrank test result doesn't show a significant difference in survival between groups of patients according to the peripheral lung SCC size of tumor (p-value=0.04).
-We then reject the use of the pT covariate.
-
-Among a total of 292 patients without underlying lung disease, 111 of them died.
-Among a total of 85 patients with emphysema, 43 of them died with 40% chance of death at 82 months.
-Among a total of 21 patients with ILA, 18 of them died with 5% chance of death at 21.5 months.
-Logrank test result shows a significant difference in survival between these groups of patients (p=4e-11).
-
-Among a total of 90 patients below the age of 60, 26 of them died.
-Among a total of 308 patients above the age of 60, 146 of them died with 63% chance of death at 81.6 months.
-Logrank test result shows a significant difference in survival between these groups of patients (p=8e-04).
-
-Among a total of 73 patients with central lung SCC size of tumor T1, 21 of them died.
-Among a total of 252 patients with central lung SCC size of tumor T2, 105 of them died.
-Among a total of 58 patients with central lung SCC size of tumor T3, 37 of them died with 24% chance of death at 38.8 months.
-Among a total of 15 patients with central lung SCC size of tumor T4, 9 of them died with 30% chance of death at 44.7 months.
-Logrank test result shows a significant difference in survival between these groups of patients (p=3e-05).
-
-Among a total of 284 patients with N0 central nearby lymph nodes involved, 114 of them died.
-Among a total of 68 patients with N1 central nearby lymph nodes involved, 27 of them died.
-Among a total of 39 patients with N2 central nearby lymph nodes involved, 27 of them died with 25% chance of death at 37.6 months.
-Among a total of 7 patients with N3 central nearby lymph nodes involved, 4 of them died with 18% chance of death at 30.8 months.
-Logrank test result shows a significant difference in survival between these groups of patients (p=0.002).
-
-Among a total of 246 patients with N0 peripheral nearby lymph nodes involved, 93 of them died.
-Among a total of 95 patients with N1 peripheral nearby lymph nodes involved, 41 of them died.
-Among a total of 53 patients with N2 peripheral nearby lymph nodes involved, 35 of them died with 30% chance of death at 37.5 months.
-Among a total of 4 patients with N3 peripheral nearby lymph nodes involved, 3 of them died with 16% chance of death at 24.2 months.
-Logrank test result shows a significant difference in survival between these groups of patients (p=5e-05).
-
-Among a total of 394 patients with M0 peripheral distant metastasis involved, 168 of them died with 84% chance of death at 103.3 months.
-Among a total of 4 patients with M1b peripheral distant metastasis involved, all of them died with 3% chance of death at 5.35 months.
-Logrank test result shows a significant difference in survival between these groups of patients (p=8e-05).
-
-Among a total of 238 patients without observed metastasis, 73 of them died.
-Among a total of 160 patients with observed metastasis, 99 of them died with 38% chance of death at 44.7 months.
-Logrank test result shows a significant difference in survival between these groups of patients (p=2e-08).
 
 
 

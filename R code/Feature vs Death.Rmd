@@ -1,0 +1,535 @@
+---
+title: "Lung Cancer Prognosis"
+author: "Lisa KOPPE, Khwansiri NINPAN, Princy PAPPACHAN"
+date: "4/23/2020"
+output: word_document
+---
+
+Data Source:
+[Integrated evaluation of clinical, pathological and radiological prognostic factors in squamous cell carcinoma of the lung](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6777828/)
+
+# Import the necessary packages:
+
+```{r}
+library(tidyverse)
+library(survival)
+library(survminer)
+```
+
+# Data preparation: load the lung cancer dataset and check data types
+
+```{r}
+
+# Check data types only columns we want to work with
+# Set default as c for the rest
+
+lungSCC_raw <- read_csv("LungCancer.csv",
+                         col_types=cols(Sex='c',
+                                       Age='d',
+                                       Location='d',
+                                       Obst_pn_or_plugging='d',
+                                       Necrosis='d',
+                                       Underlying_lung='d',
+                                       Effusion='d',
+                                       LN_ratio='d',
+                                       cT='d',
+                                       cN='d',
+                                       cM='d',
+                                       pT='d',
+                                       pN='d',
+                                       pM='d',
+                                       Smoking_state='d',  
+                                       FEV1_FVC='d',
+                                       CEA='d',
+                                       op_type='d',
+                                       death='d',
+                                       meta='d',
+                                       OS = "d",
+                                       .default = 'c'))
+```
+
+# Explore the dataset:
+    - For classification data, use "table"
+    - For numerical data: use "table" + "summary"
+      (Summary to define basic descriptive statistic, Table to check null value)
+
+```{r}
+dim(lungSCC_raw)  # Check total patients + columns
+
+
+# Radiologic features
+table(lungSCC_raw$Location, useNA="always")
+table(lungSCC_raw$Obst_pn_or_plugging, useNA="always")
+table(lungSCC_raw$Necrosis, useNA="always")
+table(lungSCC_raw$Underlying_lung, useNA="always")
+table(lungSCC_raw$Effusion, useNA="always")
+
+# Clinicopathologic features
+table(lungSCC_raw$Sex, useNA="always")
+table(lungSCC_raw$Age, useNA="always")
+summary(lungSCC_raw$Age)
+table(lungSCC_raw$LN_ratio, useNA="always")
+summary(lungSCC_raw$LN_ratio)
+table(lungSCC_raw$cT, useNA="always")
+table(lungSCC_raw$cN, useNA="always")
+table(lungSCC_raw$cM, useNA="always")
+table(lungSCC_raw$pT, useNA="always")
+table(lungSCC_raw$pN, useNA="always")
+table(lungSCC_raw$pM, useNA="always")
+table(lungSCC_raw$Smoking_state, useNA="always")
+table(lungSCC_raw$FEV1_FVC, useNA="always")
+summary(lungSCC_raw$FEV1_FVC)
+table(lungSCC_raw$CEA)
+summary(lungSCC_raw$CEA)
+table(lungSCC_raw$op_type, useNA="always")
+table(lungSCC_raw$death, useNA="always")
+table(lungSCC_raw$meta, useNA="always")
+table(lungSCC_raw$OS, useNA="always")
+summary(lungSCC_raw$OS)
+```
+
+
+Redefine the meaning of each label to make it easier for interpretation
+
+```{r}
+lungSCC <- mutate(lungSCC_raw,
+                  Location=ifelse(Location==0, "Peripheral","Central"),
+                  
+                  Necrosis = factor(Necrosis, levels=c("0","1","2"), labels = c("NoRemark", "Necrosis","Cavitation")),
+                  Necrosis <- relevel(Necrosis, "NoRemark"),
+              
+                  Underlying_lung= factor(Underlying_lung, levels = c("0","1","2"), labels = c("NoRemark", "Emphysema", "ILA")),
+                  Underlying_lung <- relevel(Underlying_lung, "NoRemark"),
+                  
+                  Sex=factor(Sex, levels=c("F", "M")),
+                  
+                  AG=ifelse((Age<60), "LT60", "OV60"),
+                  AG=factor(AG),
+                
+                  Smoking_state=factor(Smoking_state, levels = c("3","0","1","2"), labels=c("Non-smoker", "Current-smoker", "Ex-smoker","Unknown" )),
+                  Smoking_state <- relevel(Smoking_state, "Non-smoker"),
+                  
+                  OP = factor(op_type, levels = c("5","1", "2", "3", "4"), labels = c("No op", "Lobectomy", "Pneumonectomy", "Segmentectomy", "LN biopsy")),
+                  OP <- relevel(OP, "No op"),
+                  
+                  cT=factor(cT, levels=c("1", "2", "3", "4"), labels=c("cT1", "cT2", "cT3", "cT4")),
+                  
+                  cN=factor(cN, levels=c("1", "2", "3", "4"), labels=c("cN0", "cN1", "cN2", "cN3")),
+                  
+                  cM=factor(cM, levels=c("1", "3"), labels=c("cM0", "cM1b")),
+                  
+                  pT=factor(pT, levels=c("1", "2", "3", "4"), labels=c("pT1", "pT2", "pT3", "pT4")),
+                  
+                  pN=factor(pN, levels=c("1", "2", "3", "4"), labels=c("pN0", "pN1", "pN2", "pN3")),
+                  
+                  pM=factor(pM, levels=c("1", "3"), labels=c("pM0", "pM1b")))
+
+```
+
+
+Recheck the distribution of age after regrouped
+```{r}
+table(lungSCC$AG)
+```
+
+
+
+# Features description
+
+1. Location
+   = Tumor location
+   (0 = Peripheral SCC, 1 = Central SCC)
+
+2. death
+   (0 = Alive, 1 = Dead)
+
+3. OS
+   = Overall Survival in months: interval between the date of diagnosis and date of death (by any cause)
+
+## Radiologic features:
+
+4. Obst_pn_or_plugging
+   = Presence of obstructive pneumonitis/atelectais
+   (0 = Absent, 1 = Present)
+
+5. Necrosis
+   (0 = No Remark, 1 = Necrosis, 2 = Cavitization)
+
+6. Underlying_lung
+   = Underlying lung disease
+   (0 = No Remark, 1 = Emphysema, 2 = Interstitial lung abnormality)
+
+7. Effusion
+   (0 = Absent, 1 = Present)
+
+## Clinicopathologic features:
+
+8. Sex
+   = Gender of the patient
+   (F=Female, M=Male)
+
+9. AG
+   = Age at diagnosis
+   (LT60 = Less than 60 years old, OV60 = Over 60 years old)
+
+10. LN_ratio
+    = Lymph node ratio: Number of nodes with positive tumor cells divided by the number of all resected nodes
+
+11. cT
+    = Size of original tumor in central lung SCC patients
+    (1 = T1, 2 = T2, 3 = T3, 4 = T4)
+
+12. cN
+    = Nearby lymph nodes involved in central lung SCC patients
+    (1 = N0, 2 = N1, 3 = N2, 4 = N3)
+
+13. cM
+    = Distant metastasis (spread of cancer from one part of the body to another) in central lung SCC patients
+    (1 = M0, 2 = M1a, 3 = M1b, 4 = M1ab, 5 = Mx)
+
+14. pT
+    = Size of original tumor in peripheral lung SCC patients
+    (1 = T1, 2 = T2, 3 = T3, 4 = T4)
+
+15. pN
+    = Nearby lymph nodes involved in peripheral lung SCC patients
+    (1 = N0, 2 = N1, 3 = N2, 4 = N3)
+
+16. pM
+    = Distant metastasis (spread of cancer from one part of the body to another) in peripheral lung SCC patients
+    (1 = M0, 2 = M1a, 3 = M1b, 4 = M1ab, 5 = Mx)
+
+17. Smoking_state
+    = Current smoking state of the patient
+    (current-smoker, ex-smoker, non-smoker, unknown)
+
+18. FEV1_FVC
+    = Pulmonary function test in %: forced expiratory volume in a second / forced vital capacity
+
+19. CEA
+    = Serum carcinoembryonic antigen level in ng/ml (tumor marker)
+
+20. OP
+    = Type of operation the person has undergone
+    (lobectomy, pneumonectomy, segmentectomy, LN biopsy, no Op)
+
+21. meta
+    = Metastasis observed
+    (0=Absent, 1=Present)
+
+
+*Part 1: Test relationship between radiologic/clinicopathologic features and death*
+
+Methods used:
+1. Fisher's exact test (determine the relationship between two categorical variables)
+2. Logistic regression (determine the relationship between categorical continuous variables)
+
+## Relationship between radiologic features and death
+
+### Fisher's exact test
+
+Determine the relationship between two categorical variables
+
+Hypotheses:
+H0: there is no relationship between the two categorical variables.
+H1: the variables are dependent. Knowing the value of one variable helps to predict the value of the other variable.
+
+
+----
+1. Difference in risk of death in patient with and without obstructive pneumonitis/ atelectais
+2. Difference in risk of death in patient with and without lung effusion
+----
+
+
+1. Difference in risk of death in patient with and without obstructive pneumonitis/ atelectais:
+```{r}
+with(lungSCC, fisher.test(table(death, Obst_pn_or_plugging)))
+```
+
+
+
+2. Difference in risk of death in patient with and without lung effusion:
+```{r}
+with(lungSCC, fisher.test(table(death, Effusion)))
+```
+
+
+### Logistic regression
+
+Determine the relationship between categorical continuous variables
+
+Hypotheses:
+H0: there is no different in odds between that specific group and reference group
+H1: Odds of that specific group and reference group is statistically significant
+
+Interpretation:
+Estimate of interception = The log odds when covariate(s) equal 0
+Estimate of each variable = The increase/decrese in the log odds when compare to reference group
+To define the odds ratio, exponent estimate value.
+
+----
+1. Difference in risk of death based on cancer location
+2. Difference in risk of death based on cell necrosis
+3. Difference in risk of death based on underlying lung disease
+----
+
+
+1. Difference in risk of death based on cancer location:
+```{r}
+fit <- glm(death~Location, family="binomial", data=lungSCC)
+summary(fit)
+```
+
+
+```{r}
+exp(0.2749)
+```
+
+
+```{r}
+exp(confint(glm(death ~ Location, data = lungSCC, family = "binomial"))[2,])
+```
+
+
+
+2. Difference in risk of death based on cell necrosis:
+```{r}
+fit <- glm(death~Necrosis, family="binomial", data=lungSCC)
+summary(fit)
+```
+
+
+
+```{r}
+exp(-0.7482)
+exp(-0.9776)
+```
+
+
+
+3. Difference in risk of death based on underlying lung disease:
+```{r}
+fit <- glm(death~Underlying_lung, family="binomial", data=lungSCC)
+summary(fit)
+```
+
+
+```{r}
+exp(1.76823)
+exp(-0.51250)
+```
+
+
+
+## Relationship between clinicopathologic features and death
+
+### Fisher's exact test
+
+Determine the relationship between two categorical variables
+
+Hypotheses:
+H0: there is no relationship between the two categorical variables.
+H1: the variables are dependent. Knowing the value of one variable helps to predict the value of the other variable.
+
+Odds ratio:
+Odds for death in patient with specific condition
+divided by odds for death in patient without specific condition
+If those 2 sets of patient have equal odds (odds ratio = 1), that specific condition are independent to death status
+
+----
+1. Difference in risk of death in patient based on gender
+2. Difference in risk of death in patient with an age lower or greater than 60
+3. Difference in risk of death in patient with and without observed metastasis after surgery (meta)
+----
+
+
+1. Difference in risk of death in patient based on gender:
+```{r}
+with(lungSCC, fisher.test(table(death, Sex)))
+```
+
+
+
+2. Difference in risk of death in patient with Age less than and over 60:
+```{r}
+with(lungSCC, fisher.test(table(death, AG)))
+```
+
+
+
+3. Difference in risk of death in patient with and without observed metastasis after surgery (meta):
+```{r}
+with(lungSCC, table(death, meta))
+with(lungSCC, fisher.test(table(death, meta)))
+```
+
+
+### Logistic regression
+
+Determine the relationship between categorical continuous variables
+
+----
+1. Difference in risk of death based on lymph node ratio
+2. Difference in risk of death based on cT Central Lung SCC size of Tumor
+3. Difference in risk of death based on cN when nearby lymph nodes are involved
+4. Difference in risk of death based on cM when distant metastasis are involved
+5. Difference in risk of death based on pT Peripheral Lung SCC size of Tumor
+6. Difference in risk of death based on pN when nearby lymph nodes are involved
+7. Difference in risk of death based on pM when distant metastasis are involved
+8. Difference in risk of death based on the smoking state
+9. Difference in risk of death based on FEV1_FVC pulmonary function test
+10. Difference in risk of death based on CEA serum
+11. Difference in risk of death based on the type of operation undergone
+----
+
+1. Difference in risk of death based on lymph node ratio:
+```{r}
+with(lungSCC, table(death, LN_ratio))
+
+fit <- glm(death~LN_ratio, family="binomial", data=lungSCC)
+summary(fit)
+
+exp(confint(glm(death~LN_ratio, family="binomial", data=lungSCC))[2,])
+```
+
+
+```{r}
+exp(1.38)
+```
+
+
+
+2. Difference in risk of death based on cT Central Lung SCC size of Tumor:
+```{r}
+summary(glm(death ~ cT, data = lungSCC, family = "binomial"))
+```
+
+```{r}
+exp(0.5702)
+exp(1.4731)
+exp(1.3122)
+```
+
+
+
+3. Difference in risk of death based on cN when nearby lymph nodes are involved:
+```{r}
+summary(glm(death ~ cN, data = lungSCC, family = "binomial"))
+```
+
+```{r}
+exp(0.5702)
+exp(1.4731)
+exp(1.3122)
+```
+
+
+4. Difference in risk of death based on cM when distant metastasis (spread of cancer from one part of the body to another) are involved:
+```{r}
+summary(glm(death ~ cM, data = lungSCC, family = "binomial"))
+```
+
+```{r}
+exp(0.2744)
+```
+
+
+
+5. Difference in risk of death based on pT Peripheral Lung SCC size of Tumor:
+```{r}
+with(lungSCC, table(death, pT))
+
+fit <- glm(death~pT, family="binomial", data=lungSCC)
+summary(fit)
+
+exp(confint(glm(death~pT, family="binomial", data=lungSCC))[2,])
+```
+
+```{r}
+exp(0.4370)
+exp(0.9622)
+exp(1.2672)
+```
+
+
+6. Difference in risk of death based on pN when nearby lymph nodes are involved:
+```{r}
+with(lungSCC, table(death, pN))
+
+fit <- glm(death~pN, family="binomial", data=lungSCC)
+summary(fit)
+
+exp(confint(glm(death~pN, family="binomial", data=lungSCC))[2,])
+```
+
+```{r}
+exp(0.2224)
+exp(1.1628)
+exp(1.5965)
+```
+
+
+4. Difference in risk of death based on pM when distant metastasis (spread of cancer from one part of the body to another) are involved:
+```{r}
+with(lungSCC, table(death, pM))
+
+fit <- glm(death~pM, family="binomial", data=lungSCC)
+summary(fit)
+
+exp(confint(glm(death~pM, family="binomial", data=lungSCC))[2,])
+```
+
+```{r}
+exp(15.8626)
+```
+
+
+8. Difference in risk of death based on the smoking state:
+```{r}
+summary(glm(death ~ Smoking_state, data = lungSCC, family = "binomial"))
+```
+
+
+9. Difference in risk of death based on FEV1_FVC pulmonary function test:
+```{r}
+with(lungSCC, table(death, FEV1_FVC))
+
+fit <- glm(death~FEV1_FVC, family="binomial", data=lungSCC)
+summary(fit)
+
+exp(confint(glm(death~FEV1_FVC, family="binomial", data=lungSCC))[2,])
+```
+
+```{r}
+exp(0.011147)
+```
+
+
+10. Difference in risk of death based on CEA serum:
+```{r}
+with(lungSCC, table(death, CEA))
+
+fit <- glm(death~CEA, family="binomial", data=lungSCC)
+summary(fit)
+
+exp(confint(glm(death~CEA, family="binomial", data=lungSCC))[2,])
+```
+
+```{r}
+exp(-0.003081)
+```
+
+
+11. Difference in risk of death based on the type of operation undergone:
+```{r}
+summary(glm(death ~ OP, data = lungSCC, family = "binomial"))
+
+```
+
+```{r}
+exp(2.0974)
+
+```
+
+
+
